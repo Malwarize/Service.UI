@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"golang.org/x/exp/slices"
 	"os"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -122,27 +123,24 @@ func (a *App) CreateService(name string, description string, after string, the_t
 	}
 
 	// validate type
-	if the_type != "simple" && the_type != "forking" && the_type != "oneshot" && the_type != "dbus" && the_type != "notify" && the_type != "idle" {
+	if slices.Contains(backend.TheTypes, the_type) == false {
 		return ErrorDialog("invalid type " + the_type)
-
 	}
 
 	// validate restart
-	if restart != "always" && restart != "no" && restart != "on-success" && restart != "on-failure" && restart != "on-abnormal" && restart != "on-watchdog" && restart != "on-abort" {
+	if slices.Contains(backend.Restarts, restart) == false {
 		return ErrorDialog("invalid restart " + restart)
 	}
 
 	// validate wantedBy
-	if wantedBy != "multi-user.target" && wantedBy != "graphical.target" && wantedBy != "rescue.target" && wantedBy != "emergency.target" {
+	if slices.Contains(backend.WantedBys, wantedBy) == false {
 		return ErrorDialog("invalid wantedBy " + wantedBy)
-
 	}
 
 	// validate category
 	groups, err := backend.GetServiceGroups()
 	if err != nil {
 		return ErrorDialog(err.Error())
-
 	}
 	if _, ok := groups[category]; !ok {
 		return ErrorDialog("invalid category " + category)
@@ -195,22 +193,20 @@ func (a *App) EditService(name string, description string, after string, the_typ
 	}
 
 	// validate type
-	if the_type != "simple" && the_type != "forking" && the_type != "oneshot" && the_type != "dbus" && the_type != "notify" && the_type != "idle" {
+	if slices.Contains(backend.TheTypes, the_type) == false {
 		return ErrorDialog("invalid type " + the_type)
-
 	}
 
 	// validate restart
-	if restart != "always" && restart != "no" && restart != "on-success" && restart != "on-failure" && restart != "on-abnormal" && restart != "on-watchdog" && restart != "on-abort" {
+	if slices.Contains(backend.Restarts, restart) == false {
 		return ErrorDialog("invalid restart " + restart)
-
 	}
 
 	// validate wantedBy
-	if wantedBy != "multi-user.target" && wantedBy != "default.target" && wantedBy != "network-online.target" && wantedBy != "sysinit.target" && wantedBy != "basic.target" && wantedBy != "graphical.target" && wantedBy != "shutdown.target" {
+	if slices.Contains(backend.WantedBys, wantedBy) == false {
 		return ErrorDialog("invalid wantedBy " + wantedBy)
-
 	}
+
 	// validate category
 	groups, err := backend.GetServiceGroups()
 	if err != nil {
@@ -266,4 +262,15 @@ func (a *App) DeleteGroup(name string) string {
 		return ErrorDialog(err.Error())
 	}
 	return "{}"
+}
+func (a *App) FetchLogsForService(name string) string {
+	journalCtlLogs, err := backend.GetJournalctl(name)
+	if err != nil {
+		return ErrorDialog(err.Error())
+	}
+	dataJson, err := json.Marshal(journalCtlLogs)
+	if err != nil {
+		return ErrorDialog(err.Error())
+	}
+	return string(dataJson)
 }

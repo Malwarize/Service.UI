@@ -693,6 +693,10 @@ video {
   height: calc(100vh - 10rem);
 }
 
+.h-\[calc\(100vh-14rem\)\] {
+  height: calc(100vh - 14rem);
+}
+
 .h-\[calc\(100vh-15rem\)\] {
   height: calc(100vh - 15rem);
 }
@@ -754,6 +758,16 @@ video {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.cursor-default {
+  cursor: default;
+}
+
+.select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 
 .grid-cols-1 {
@@ -1001,6 +1015,10 @@ video {
 .outline-none {
   outline: 2px solid transparent;
   outline-offset: 2px;
+}
+
+.outline {
+  outline-style: solid;
 }
 
 .filter {

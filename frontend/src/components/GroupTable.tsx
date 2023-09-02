@@ -1,4 +1,4 @@
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import {DataGrid, gridClasses, GridColDef, GridValueGetterParams} from '@mui/x-data-grid';
 import * as React from 'react';
 import {makeStyles} from "@mui/material";
 import {Link, useNavigate} from "react-router-dom";
@@ -23,6 +23,14 @@ export default function GroupTable({ rows, columns }: any) {
                     navigate(`/groups/${params.row.Category}`)
                 }}
                 className={'cursor-pointer'}
+                sx={{
+                    [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]: {
+                        outline: "none"
+                    },
+                    [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]: {
+                        outline: "none"
+                    }
+                }}
             />
         </div>
     );

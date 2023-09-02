@@ -61,7 +61,7 @@ export default function AddServiceForm(props : props ) {
         if (parsedServices?.Error) {
             props.showErrorMessage(parsedServices.Error);
         }else{
-            navigate(`/services/${category}`);
+            navigate(`/groups/${category}`);
         }
     })
   }
@@ -80,7 +80,7 @@ export default function AddServiceForm(props : props ) {
               name="name"
               id="name"
               className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
-              placeholder="example.service"
+              placeholder="flaskwebserver"
             />
 
             <label
@@ -94,7 +94,7 @@ export default function AddServiceForm(props : props ) {
               name="description"
               id="description"
               className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
-              placeholder="Example service description"
+              placeholder="this is flask webserver for my website"
             />
 
             <label htmlFor="after" className="text-sm font-bold text-gray-500">
@@ -105,8 +105,8 @@ export default function AddServiceForm(props : props ) {
               id="after"
               className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
             >
-              {services.map((service) => (
-                <option value={service.Name}>{service.Name}</option>
+              {services.map((service, index) => (
+                <option key={index} value={service.Name}>{service.Name}</option>
               ))}
             </select>
 
@@ -121,8 +121,8 @@ export default function AddServiceForm(props : props ) {
               id="the_type"
               className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
             >
-              {types.map((type) => (
-                <option value={type}>{type}</option>
+              {types.map((type, index) => (
+                <option key={index} value={type}>{type}</option>
               ))}
             </select>
 
@@ -166,8 +166,8 @@ export default function AddServiceForm(props : props ) {
               id="restart"
               className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
             >
-              {restartOptions.map((restart) => (
-                <option value={restart}>{restart}</option>
+              {restartOptions.map((restart,index) => (
+                <option value={restart} key={index}>{restart}</option>
               ))}
             </select>
 
@@ -182,8 +182,8 @@ export default function AddServiceForm(props : props ) {
               id="wantedBy"
               className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
             >
-              {wantedByOptions.map((wantedBy) => (
-                <option value={wantedBy}>{wantedBy}</option>
+              {wantedByOptions.map((wantedBy,index) => (
+                <option value={wantedBy}  key={index}>{wantedBy}</option>
               ))}
             </select>
             <div></div>

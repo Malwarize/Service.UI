@@ -33,6 +33,11 @@ export interface ServiceFile {
     Install :InstallSection
 }
 
-export interface BackendError {
-    Error: string;
+export interface JournalLog {
+    Timestamp: string;
+    Message: string;
+}
+
+export interface JournalLogs {
+    logs: JournalLog[];
 }

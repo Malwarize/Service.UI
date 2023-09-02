@@ -100,7 +100,7 @@ function ServicesForGroup(props : props) {
                         "renderCell": (params: any) => {
                             return (
                                 <button>
-                                    <Link to={'/groups/' + groupName + '/editService/' + params.row.Name}>
+                                    <Link to={'/groups/' + groupName + '/editService/' + params.row.Name} onClick={(e) => {e.stopPropagation();}}>
                                     <svg className="w-4 h-4" fill="#000000" version="1.1" id="Capa_1"
                                          xmlns="http://www.w3.org/2000/svg"
                                          width="800px" height="800px" viewBox="0 0 537.938 537.939"
@@ -121,7 +121,11 @@ function ServicesForGroup(props : props) {
                             if (params.row.Status === 'active') {
                                 return (
                                     <div>
-                                        <button onClick={() => handleRestartService(params.row.Name)}>
+                                        <button onClick={(e) => {
+                                            handleRestartService(params.row.Name)
+                                            e.stopPropagation();
+                                        }
+                                        }>
                                             <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg"
                                                  stroke="#a7ff24">
                                                 <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -133,7 +137,10 @@ function ServicesForGroup(props : props) {
                                                 </g>
                                             </svg>
                                         </button>
-                                        <button onClick={() => handleStopService(params.row.Name)}>
+                                        <button onClick={(e) => {
+                                            handleStopService(params.row.Name)
+                                            e.stopPropagation();
+                                        }}>
                                             <svg className="h-5 w-5" viewBox="-0.5 0 25 25" fill="red" xmlns="http://www.w3.org/2000/svg">
                                                 <path
                                                     d="M17 3.42004H7C4.79086 3.42004 3 5.2109 3 7.42004V17.42C3 19.6292 4.79086 21.42 7 21.42H17C19.2091 21.42 21 19.6292 21 17.42V7.42004C21 5.2109 19.2091 3.42004 17 3.42004Z"
@@ -144,7 +151,10 @@ function ServicesForGroup(props : props) {
                                 )
                             }
                             return (
-                                <button onClick={() => handleStartService(params.row.Name)}>
+                                <button onClick={(e) => {
+                                    handleStartService(params.row.Name)
+                                    e.stopPropagation();
+                                }}>
                                     <svg className="w-5 h-5" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#000000">
                                         <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                                         <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>

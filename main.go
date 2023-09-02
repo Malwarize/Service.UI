@@ -2,7 +2,6 @@ package main
 
 import (
 	"embed"
-
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -19,8 +18,8 @@ func main() {
 	// Create application with options
 	err := wails.Run(&options.App{
 		Title:  "Service.UI",
-		Width:  1024,
-		Height: 768,
+		Width:  987,
+		Height: 536,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
@@ -35,11 +34,12 @@ func main() {
 		Linux: &linux.Options{
 			WindowIsTranslucent: true,
 		},
-		// if double click , maximize window
-
+		MinHeight: 536,
+		MinWidth:  987,
 	})
 
 	if err != nil {
 		println("Error:", err.Error())
 	}
+
 }

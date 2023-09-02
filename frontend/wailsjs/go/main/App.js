@@ -30,6 +30,10 @@ export function Exit() {
   return window['go']['main']['App']['Exit']();
 }
 
+export function FetchLogsForService(arg1) {
+  return window['go']['main']['App']['FetchLogsForService'](arg1);
+}
+
 export function FetchServiceFile(arg1) {
   return window['go']['main']['App']['FetchServiceFile'](arg1);
 }

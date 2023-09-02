@@ -1,5 +1,6 @@
-import { DataGrid, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridValueGetterParams,gridClasses } from '@mui/x-data-grid';
 import * as React from 'react';
+import {useNavigate} from "react-router-dom";
 
 export default function SortableTable({ rows, columns }: any) {
 
@@ -35,7 +36,7 @@ export default function SortableTable({ rows, columns }: any) {
             );
         }
     }
-
+    const navigate = useNavigate();
     return (
         <div style={{ height: '100%', width: '100%' }}>
             <DataGrid
@@ -45,6 +46,22 @@ export default function SortableTable({ rows, columns }: any) {
                 disableColumnMenu={true}
                 disableColumnSelector={true}
                 rowSelection={false}
+                onRowClick={(params) => {
+                    navigate(`/logs/${params.row.Name}`)
+                }
+                }
+                className={'cursor-pointer'}
+                //disable cell selection effect on click
+
+                sx={{
+                    [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]: {
+                        outline: "none"
+                    },
+                    [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]: {
+                        outline: "none"
+                    }
+                }}
+
             />
         </div>
     );

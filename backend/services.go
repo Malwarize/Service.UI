@@ -101,8 +101,10 @@ func GetServiceFile(name string) (ServiceFile, error) {
 	serviceFile := NewServiceFile()
 	servicePath, err := findServiceUnitFile(name)
 	if err != nil {
+		fmt.Println("error finding service file-------->,", err.Error())
 		return serviceFile, err
 	}
+	fmt.Println("service path-------->", servicePath)
 	data, err := os.ReadFile(servicePath)
 	if err != nil {
 		return serviceFile, err
@@ -397,12 +399,14 @@ func CreateService(name string, description string, after string, the_type strin
 	err = AddServiceToGroup(category, name)
 	// enable the service
 	cmd := exec.Command("systemctl", "daemon-reload")
-	err = cmd.Run()
+	out, err := cmd.CombinedOutput()
+	fmt.Println(string(out))
 	if err != nil {
 		return err
 	}
 	cmd = exec.Command("systemctl", "enable", name+".service")
-	err = cmd.Run()
+	out, err = cmd.CombinedOutput()
+	fmt.Println(string(out))
 	if err != nil {
 		return err
 	}
@@ -448,7 +452,14 @@ func EditService(name string, description string, after string, the_type string,
 	serviceFile.Service.WorkingDir = workingDirectory
 	serviceFile.Service.Restart = restart
 	serviceFile.Install.WantedBy = wantedBy
-	return serviceFile.Save(name)
+	err = serviceFile.Save(name)
+	if err != nil {
+		return err
+	}
+	// reload the daemon
+	cmd := exec.Command("systemctl", "daemon-reload")
+	cmd.Run()
+	return nil
 }
 
 func DeleteService(name string) error {
@@ -456,6 +467,13 @@ func DeleteService(name string) error {
 	if err != nil {
 		return err
 	}
+	// stop the service
+	cmd := exec.Command("systemctl", "stop", name+".service")
+	_ = cmd.Run()
+	// disable the service
+	cmd = exec.Command("systemctl", "disable", name+".service")
+	_ = cmd.Run()
+
 	// delete the service file
 	err = os.Remove(servicePath)
 	if err != nil {
@@ -476,7 +494,7 @@ func DeleteService(name string) error {
 	}
 
 	// reload the daemon
-	cmd := exec.Command("systemctl", "daemon-reload")
+	cmd = exec.Command("systemctl", "daemon-reload")
 	err = cmd.Run()
 	if err != nil {
 		return err
@@ -520,4 +538,49 @@ func findServiceUnitFile(serviceName string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("service unit file path not found")
+}
+
+type LogEntryOut struct {
+	Timestamp string `json:"Timestamp"`
+	Message   string `json:"Message"`
+}
+type LogEntryIn struct {
+	Timestamp string `json:"__REALTIME_TIMESTAMP"`
+	Message   string `json:"Message"`
+}
+
+func GetJournalctl(serviceName string) ([]LogEntryOut, error) {
+	// Create a command to run journalctl with the specified service name.
+	cmd := exec.Command("journalctl", "-u", serviceName, "--output=json")
+
+	// Run the command and capture its output.
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+
+	// Split the output into individual JSON log entries.
+	logEntriesJSON := strings.Split(string(output), "\n")
+
+	// Create a slice to store the parsed LogEntry structs.
+	var logEntries []LogEntryOut
+
+	// Parse each JSON log entry and append it to the slice.
+	for _, logJSON := range logEntriesJSON {
+		if logJSON == "" {
+			continue
+		}
+		var logEntry LogEntryIn
+		err := json.Unmarshal([]byte(logJSON), &logEntry)
+		if err != nil {
+			return nil, err
+		}
+		logEntryO := LogEntryOut{
+			Timestamp: logEntry.Timestamp,
+			Message:   logEntry.Message,
+		}
+		logEntries = append(logEntries, logEntryO)
+	}
+
+	return logEntries, nil
 }
