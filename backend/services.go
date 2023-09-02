@@ -22,6 +22,7 @@ type UnitSection struct {
 	Description string `json:"Description"`
 	After       string `json:"After"`
 }
+
 type ServiceSection struct {
 	Type       string `json:"Type"`
 	Exec       string `json:"ExecStart"`
@@ -39,6 +40,23 @@ type ServiceFile struct {
 	Install InstallSection `json:"Install"`
 }
 
+func NewServiceFile() ServiceFile {
+	return ServiceFile{
+		Unit: UnitSection{
+			Description: " ",
+			After:       " ",
+		},
+		Service: ServiceSection{
+			Type:       " ",
+			Exec:       " ",
+			WorkingDir: " ",
+			Restart:    " ",
+		},
+		Install: InstallSection{
+			WantedBy: "",
+		},
+	}
+}
 func (s *ServiceFile) Save(name string) error {
 	// loop over attributes and set them to the service file
 	content := "[Unit]\n"
@@ -66,42 +84,60 @@ func (s *ServiceFile) Save(name string) error {
 	}
 	return nil
 }
-
 func (s *ServiceFile) Delete(name string) error {
-	return os.Remove(ServicesPath + name + ".service")
+	path, err := findServiceUnitFile(name)
+	if err != nil {
+		return err
+	}
+	return os.Remove(path)
+}
+func getFieldFromLine(line string) string {
+	if len(strings.Split(line, "=")) < 2 {
+		return " "
+	}
+	return strings.Split(line, "=")[1]
 }
 func GetServiceFile(name string) (ServiceFile, error) {
-	var serviceFile ServiceFile
-	data, err := os.ReadFile(ServicesPath + name + ".service")
+	serviceFile := NewServiceFile()
+	servicePath, err := findServiceUnitFile(name)
+	if err != nil {
+		return serviceFile, err
+	}
+	data, err := os.ReadFile(servicePath)
 	if err != nil {
 		return serviceFile, err
 	}
 	for _, line := range strings.Split(string(data), "\n") {
+		if line == "" {
+			continue
+		}
+		if len(strings.Split(line, "=")) < 2 {
+			continue
+		}
 		if strings.Contains(line, "Description") {
-			serviceFile.Unit.Description = strings.Split(line, "=")[1]
+			serviceFile.Unit.Description = getFieldFromLine(line)
 		}
 		if strings.Contains(line, "After") {
-			serviceFile.Unit.After = strings.Split(line, "=")[1]
+			serviceFile.Unit.After = getFieldFromLine(line)
 		}
 		if strings.Contains(line, "Type") {
-			serviceFile.Service.Type = strings.Split(line, "=")[1]
+			serviceFile.Service.Type = getFieldFromLine(line)
 		}
 		if strings.Contains(line, "ExecStart") {
-			serviceFile.Service.Exec = strings.Split(line, "=")[1]
+			serviceFile.Service.Exec = getFieldFromLine(line)
 		}
 		if strings.Contains(line, "WorkingDirectory") {
-			serviceFile.Service.WorkingDir = strings.Split(line, "=")[1]
+			serviceFile.Service.WorkingDir = getFieldFromLine(line)
 		}
 		if strings.Contains(line, "Restart") {
-			serviceFile.Service.Restart = strings.Split(line, "=")[1]
+			serviceFile.Service.Restart = getFieldFromLine(line)
 		}
 		if strings.Contains(line, "WantedBy") {
-			serviceFile.Install.WantedBy = strings.Split(line, "=")[1]
+			serviceFile.Install.WantedBy = getFieldFromLine(line)
 		}
 	}
 	return serviceFile, nil
 }
-
 func GetServices() ([]ServiceInfo, error) {
 	cmd := exec.Command("systemctl", "list-units", "--type=service", "--all", "--no-pager", "--plain", "--full")
 	var stdout, stderr bytes.Buffer
@@ -141,7 +177,6 @@ func GetServices() ([]ServiceInfo, error) {
 
 	return services[1 : len(services)-5], nil
 }
-
 func StopService(name string) error {
 	cmd := exec.Command("systemctl", "stop", name)
 	var stderr bytes.Buffer
@@ -417,8 +452,12 @@ func EditService(name string, description string, after string, the_type string,
 }
 
 func DeleteService(name string) error {
+	servicePath, err := findServiceUnitFile(name)
+	if err != nil {
+		return err
+	}
 	// delete the service file
-	err := os.Remove(ServicesPath + name + ".service")
+	err = os.Remove(servicePath)
 	if err != nil {
 		return err
 	}
@@ -434,6 +473,13 @@ func DeleteService(name string) error {
 				groups[categ] = group
 			}
 		}
+	}
+
+	// reload the daemon
+	cmd := exec.Command("systemctl", "daemon-reload")
+	err = cmd.Run()
+	if err != nil {
+		return err
 	}
 	return groups.Save()
 }
@@ -454,4 +500,24 @@ func DeleteGroup(category string) error {
 	} else {
 		return fmt.Errorf("the category does not exist")
 	}
+}
+
+func findServiceUnitFile(serviceName string) (string, error) {
+	// Run the systemctl command to get the unit file path
+	cmd := exec.Command("systemctl", "show", "-p", "FragmentPath", serviceName)
+	output, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	// Parse the output to extract the path
+	outputStr := strings.TrimSpace(string(output))
+	lines := strings.Split(outputStr, "\n")
+	for _, line := range lines {
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 && parts[0] == "FragmentPath" {
+			return parts[1], nil
+		}
+	}
+	return "", fmt.Errorf("service unit file path not found")
 }

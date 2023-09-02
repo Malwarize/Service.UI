@@ -35,6 +35,8 @@ func main() {
 		Linux: &linux.Options{
 			WindowIsTranslucent: true,
 		},
+		// if double click , maximize window
+
 	})
 
 	if err != nil {

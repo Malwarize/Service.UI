@@ -2,18 +2,24 @@ import React from "react";
 import {AddGroup} from "../../wailsjs/go/main/App";
 import {useNavigate} from "react-router-dom";
 
-export default function AddGroupForm() {
+interface props {
+    showErrorMessage : (message : string) => void
+}
+export default function AddGroupForm(props : props){
     const [groupName, setGroupName] = React.useState('');
     const [description, setDescription] = React.useState('');
     const navigate = useNavigate();
-    function saveGroup(name : string, description : string) {
-        AddGroup(name, description).then(r => {
-            console.log(r);
+    function handleAddGroup(name : string, description : string) {
+        AddGroup(name, description).then(response => {
+            const data = JSON.parse(response);
+            if(data?.Error){
+                props.showErrorMessage(data.Error)
+            }else{
+                navigate(`/groups/`)
+            }
         }).catch((error) => {
-            console.error('Error adding group:', error);
-        })
-        // redirect to group page
-        navigate(`/groups/`);
+            props.showErrorMessage(error.toString())
+        });
     }
 
     return<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mx-10">
@@ -43,7 +49,7 @@ export default function AddGroupForm() {
     </div>
     <button
             className="bg-primary-purple text-white rounded-md p-2 m-2 hover:bg-deep-gray"
-            onClick={() => saveGroup(groupName, description)}>
+            onClick={() => handleAddGroup(groupName, description)}>
             Save
     </button>
 </div>

@@ -2,7 +2,7 @@ import "../output.css";
 import {Exit} from "../../wailsjs/go/main/App";
 import {Minimize} from "../../wailsjs/go/main/App";
 import SearchBar from "./SearchBar";
-import React, {useState} from "react";
+import React  from "react";
 interface searchBarProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -27,14 +27,14 @@ function Header({searchQuery, setSearchQuery}: searchBarProps) {
             fill="#000000"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 52 52"
-            enable-background="new 0 0 52 52"
+            enableBackground="new 0 0 52 52"
             xmlSpace="preserve"
           >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g
               id="SVGRepo_tracerCarrier"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             ></g>
             <g id="SVGRepo_iconCarrier">
               {" "}
@@ -55,11 +55,11 @@ function Header({searchQuery, setSearchQuery}: searchBarProps) {
             xmlnsXlink="http://www.w3.org/1999/xlink"
             fill="#000000"
           >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g
               id="SVGRepo_tracerCarrier"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             ></g>
             <g id="SVGRepo_iconCarrier">
               {" "}
@@ -69,18 +69,18 @@ function Header({searchQuery, setSearchQuery}: searchBarProps) {
               <g
                 id="Free-Icons"
                 stroke="none"
-                stroke-width="1"
+                strokeWidth="1"
                 fill="none"
-                fill-rule="evenodd"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                fillRule="evenodd"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
                 {" "}
                 <g
                   transform="translate(-157.000000, -158.000000)"
                   id="Group"
                   stroke="#000000"
-                  stroke-width="2"
+                  strokeWidth="2"
                 >
                   {" "}
                   <g transform="translate(153.000000, 154.000000)" id="Shape">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
   CreateService,
   FetchServices,
@@ -7,19 +7,65 @@ import { useNavigate } from "react-router-dom";
 import {ServiceInfo} from "../shared/Types";
 import {restartOptions, types, wantedByOptions} from "../shared/Constants";
 
-export default function AddServiceForm() {
+interface props {
+  showErrorMessage : any
+}
+export default function AddServiceForm(props : props ) {
   const [services, setServices] = useState<ServiceInfo[]>([]);
+  useEffect(() => {
+      FetchServices()
+          .then((jsonString) => {
+              const parsedServices = JSON.parse(jsonString);
+              if (parsedServices?.Error) {
+                  props.showErrorMessage(parsedServices.Error);
+              }
+              setServices(parsedServices);
+          })
+          .catch((error) => {
+              props.showErrorMessage(error);
+          });
+  }, []);
 
-  FetchServices()
-    .then((jsonString) => {
-      const parsedServices = JSON.parse(jsonString);
-      setServices(parsedServices);
-    })
-    .catch((error) => {
-      console.error("Error fetching services:", error);
-    });
   const category = window.location.hash.split("/")[2];
   const navigate = useNavigate();
+
+  const handleCreateService = () =>{
+      const name = (
+          document.getElementById("name") as HTMLInputElement
+      ).value;
+      const description = (
+          document.getElementById("description") as HTMLInputElement
+      ).value;
+      const after = (
+          document.getElementById("after") as HTMLInputElement
+      ).value;
+      const the_type = (
+          document.getElementById("the_type") as HTMLInputElement
+      ).value;
+      const execStart = (
+          document.getElementById("execStart") as HTMLInputElement
+      ).value;
+      const workingDirectory = (
+          document.getElementById(
+              "workingDirectory"
+          ) as HTMLInputElement
+      ).value;
+      const restart = (
+          document.getElementById("restart") as HTMLInputElement
+      ).value;
+      const wantedBy = (
+          document.getElementById("wantedBy") as HTMLInputElement
+      ).value;
+    CreateService(name,description,after,the_type,execStart,workingDirectory,restart,wantedBy,category).then((jsonString) => {
+        const parsedServices = JSON.parse(jsonString);
+        if (parsedServices?.Error) {
+            props.showErrorMessage(parsedServices.Error);
+        }else{
+            navigate(`/services/${category}`);
+        }
+    })
+  }
+
   return (
     <div className="h-[calc(100vh-10rem)] overflow-y-scroll overflow-visible">
       <div className="flex flex-col items-center justify-center mx-20">
@@ -143,45 +189,9 @@ export default function AddServiceForm() {
             <div></div>
             <button
               className="w-full p-2 mt-4 bg-primary-purple rounded shadow text-gray-100 hover:bg-purple-600"
-              onClick={() => {
-                const name = (
-                  document.getElementById("name") as HTMLInputElement
-                ).value;
-                const description = (
-                  document.getElementById("description") as HTMLInputElement
-                ).value;
-                const after = (
-                  document.getElementById("after") as HTMLInputElement
-                ).value;
-                const the_type = (
-                  document.getElementById("the_type") as HTMLInputElement
-                ).value;
-                const execStart = (
-                  document.getElementById("execStart") as HTMLInputElement
-                ).value;
-                const workingDirectory = (
-                  document.getElementById(
-                    "workingDirectory"
-                  ) as HTMLInputElement
-                ).value;
-                const restart = (
-                  document.getElementById("restart") as HTMLInputElement
-                ).value;
-                const wantedBy = (
-                  document.getElementById("wantedBy") as HTMLInputElement
-                ).value;
-                CreateService(
-                  name,
-                  description,
-                  after,
-                  the_type,
-                  execStart,
-                  workingDirectory,
-                  restart,
-                  wantedBy,
-                  category
-                );
-                navigate("/groups/"+ category)
+              onClick={(e) => {
+                e.preventDefault();
+                handleCreateService();
               }}
             >
               Add

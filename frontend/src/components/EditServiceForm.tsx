@@ -4,10 +4,13 @@ import {
 } from "../../wailsjs/go/main/App";
 import { useNavigate } from "react-router-dom";
 import {Groups, ServiceFile, ServiceInfo} from "../shared/Types";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {restartOptions, types, wantedByOptions} from "../shared/Constants";
 
-export default function EditServiceForm() {
+interface props {
+    showErrorMessage : any
+}
+export default function EditServiceForm(props : props ) {
     const [services, setServices] = useState<ServiceInfo[]>([]);
     const [groups, setGroups] = useState<Groups>({});
     const [serviceFile, setServiceFile] = useState<ServiceFile>({
@@ -25,35 +28,105 @@ export default function EditServiceForm() {
             WantedBy: "",
         },
     });
+    const ServiceName = window.location.hash.split("/")[4];
 
-    FetchServices()
-        .then((jsonString) => {
+    const handleDeleteService = () => {
+        DeleteService(ServiceName).then((jsonString) => {
             const parsedServices = JSON.parse(jsonString);
-            setServices(parsedServices);
-        })
-        .catch((error) => {
-            console.error("Error fetching services:", error);
+            if (parsedServices?.Error) {
+                props.showErrorMessage(parsedServices.Error);
+            } else{
+                navigate("/groups/"+defaultCategory);
+            }
+        }).catch((error) => {
+            props.showErrorMessage(error);
         });
+    }
 
-    FetchServiceGroup()
+    const handleEditService = () => {
+        const description = (
+            document.getElementById("description") as HTMLInputElement
+        ).value;
+        const after = (
+            document.getElementById("after") as HTMLInputElement
+        ).value;
+        const the_type = (
+            document.getElementById("the_type") as HTMLInputElement
+        ).value;
+        const execStart = (
+            document.getElementById("execStart") as HTMLInputElement
+        ).value;
+        const workingDirectory = (
+            document.getElementById(
+                "workingDirectory"
+            ) as HTMLInputElement
+        ).value;
+        const restart = (
+            document.getElementById("restart") as HTMLInputElement
+        ).value;
+        const wantedBy = (
+            document.getElementById("wantedBy") as HTMLInputElement
+        ).value;
+        const category = (
+            document.getElementById("category") as HTMLInputElement
+        ).value;
+
+        EditService(ServiceName,description,after,the_type,execStart,workingDirectory,restart,wantedBy,category).then((jsonString) => {
+            const parsedServices = JSON.parse(jsonString);
+            if (parsedServices?.Error) {
+                props.showErrorMessage(parsedServices.Error);
+            }else {
+                navigate(`/groups/${defaultCategory}`);
+            }
+        }).catch((error) => {
+            props.showErrorMessage(error);
+        });
+    }
+    useEffect(() => {
+        FetchServices()
+            .then((jsonString) => {
+                const parsedServices = JSON.parse(jsonString);
+                if (parsedServices?.Error) {
+                    props.showErrorMessage(parsedServices.Error);
+                }
+                setServices(parsedServices);
+            })
+            .catch((error) => {
+                props.showErrorMessage(error);
+            });
+    }, []);
+
+    useEffect( () => {
+        FetchServiceGroup()
         .then((jsonString:string) => {
             const parsedGroups = JSON.parse(jsonString);
+            if (parsedGroups?.Error) {
+                props.showErrorMessage(parsedGroups.Error);
+            }
             setGroups(parsedGroups);
         })
         .catch((error) => {
-            console.error("Error fetching groups:", error);
+            props.showErrorMessage(error);
         }
     );
-    const ServiceName = window.location.hash.split("/")[4];
-    FetchServiceFile(ServiceName)
-        .then((jsonString) => {
-        const parsedServiceFile = JSON.parse(jsonString);
-        setServiceFile(parsedServiceFile);
-    })
-        .catch((error) => {
-            console.error("Error fetching service file:", error);
+    });
+
+    useEffect( () => {
+        FetchServiceFile(ServiceName)
+            .then((jsonString) => {
+            const parsedServiceFile = JSON.parse(jsonString);
+            if (parsedServiceFile?.Error) {
+                props.showErrorMessage(parsedServiceFile.Error);
+            }
+            setServiceFile(parsedServiceFile);
+        }).catch((error) => {
+            props.showErrorMessage(error);
+            }
+        );
         }
     );
+
+
 
     const defaultCategory = window.location.hash.split("/")[2];
 
@@ -89,8 +162,8 @@ export default function EditServiceForm() {
                             className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
                             defaultValue={serviceFile.Unit.After}
                         >
-                            {services.map((service) => (
-                                <option value={service.Name}>{service.Name}</option>
+                            {services.map((service: ServiceInfo) => (
+                                <option key={service.Name} value={service.Name}>{service.Name}</option>
                             ))}
                             <option value={serviceFile.Unit.After}>{serviceFile.Unit.After}</option>
                         </select>
@@ -108,7 +181,7 @@ export default function EditServiceForm() {
                             defaultValue={serviceFile.Service.Type}
                         >
                             {types.map((type) => (
-                                <option value={type}>{type}</option>
+                                <option value={type} key={type}>{type}</option>
                             ))}
                             <option value={serviceFile.Service.Type}>{serviceFile.Service.Type}</option>
                         </select>
@@ -157,9 +230,9 @@ export default function EditServiceForm() {
                             defaultValue={serviceFile.Service.Restart}
                         >
                             {restartOptions.map((restart) => (
-                                <option value={restart}>{restart}</option>
+                                <option value={restart} key={restart}>{restart}</option>
                             ))}
-                            <option value={serviceFile.Service.Restart}>{serviceFile.Service.Restart}</option>
+                            <option value={serviceFile.Service.Restart} key={serviceFile.Service.Restart}>{serviceFile.Service.Restart}</option>
                         </select>
 
                         <label
@@ -175,7 +248,7 @@ export default function EditServiceForm() {
                             defaultValue={serviceFile.Install.WantedBy}
                         >
                             {wantedByOptions.map((wantedBy) => (
-                                <option value={wantedBy}>{wantedBy}</option>
+                                <option value={wantedBy} key={wantedBy}>{wantedBy}</option>
                             ))}
                             <option value={serviceFile.Install.WantedBy}>{serviceFile.Install.WantedBy}</option>
                         </select>
@@ -192,63 +265,16 @@ export default function EditServiceForm() {
                             defaultValue={defaultCategory}
                         >
                             {Object.keys(groups).map((category) => (
-                                <option value={category}>{category}</option>
+                                <option value={category} key={category}>{category}</option>
                             ))}
                             <option value={defaultCategory}>{defaultCategory}</option>
                         </select>
-                        <button className="w-full p-2 mt-4 bg-red-500 rounded shadow text-gray-100 hover:bg-deep-gray" onClick={() => {
-                            DeleteService(ServiceName)
-                            navigate("/groups/" + defaultCategory)
-                            }
-                        }>
+                        <button className="w-full p-2 mt-4 bg-red-500 rounded shadow text-gray-100 hover:bg-deep-gray" onClick={handleDeleteService}>
                             Delete
                         </button>
                         <button
                             className="w-full p-2 mt-4 bg-primary-purple rounded shadow text-gray-100 hover:bg-purple-600"
-                            onClick={() => {
-                                const description = (
-                                    document.getElementById("description") as HTMLInputElement
-                                ).value;
-                                const after = (
-                                    document.getElementById("after") as HTMLInputElement
-                                ).value;
-                                const the_type = (
-                                    document.getElementById("the_type") as HTMLInputElement
-                                ).value;
-                                const execStart = (
-                                    document.getElementById("execStart") as HTMLInputElement
-                                ).value;
-                                const workingDirectory = (
-                                    document.getElementById(
-                                        "workingDirectory"
-                                    ) as HTMLInputElement
-                                ).value;
-                                const restart = (
-                                    document.getElementById("restart") as HTMLInputElement
-                                ).value;
-                                const wantedBy = (
-                                    document.getElementById("wantedBy") as HTMLInputElement
-                                ).value;
-
-                                const category = (
-                                    document.getElementById("category") as HTMLInputElement
-                                ).value;
-
-                                EditService(
-                                    ServiceName,
-                                    description,
-                                    after,
-                                    the_type,
-                                    execStart,
-                                    workingDirectory,
-                                    restart,
-                                    wantedBy,
-                                    category
-                                ).then(r => {
-                                    console.log(r)
-                                });
-                            }}
-                        >
+                            onClick={handleEditService}>
                             Save
                         </button>
                     </div>

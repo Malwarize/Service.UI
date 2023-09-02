@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-    FetchServiceGroup,
-    FetchServices,
     FetchServicesOfAGroup,
     RestartService,
     StartService,
@@ -9,25 +7,15 @@ import {
 } from '../../wailsjs/go/main/App';
 import SortableTable from './SortableTable';
 import {Link} from "react-router-dom";
-interface ServiceInfo {
-    Name: string;
-    Status: string;
-    Description: string;
+import {ServiceInfo} from "../shared/Types";
+
+
+interface props {
+    searchQuery: string;
+    showErrorMessage: any;
 }
 
-interface Group{
-    Category: string;
-    Description: string;
-    Services: ServiceInfo[];
-}
-
-interface ServiceInfo {
-    Name: string;
-    Status: string;
-    Description: string;
-}
-
-function ServicesForGroup({ searchQuery }: { searchQuery: string }) {
+function ServicesForGroup(props : props) {
     const [services, setServices] = useState<ServiceInfo[]>([]);
 
     // /#/group/categoryName
@@ -39,18 +27,20 @@ function ServicesForGroup({ searchQuery }: { searchQuery: string }) {
                 return
             }
             const parsedServices = JSON.parse(jsonString);
-            console.log(parsedServices)
+            if (parsedServices?.Error) {
+                props.showErrorMessage(parsedServices.Error);
+            }
             setServices(parsedServices)
         }
         ).catch((error) => {
-            console.error('Error fetching services:', error);
+            props.showErrorMessage(error)
             }
         )
     }
 
 
     const filteredServices = services.filter((service) =>
-        service.Name.toLowerCase().includes(searchQuery.toLowerCase())
+        service.Name.toLowerCase().includes(props.searchQuery.toLowerCase())
     );
 
 
@@ -65,21 +55,42 @@ function ServicesForGroup({ searchQuery }: { searchQuery: string }) {
     }, []);
 
 
-    function StopServiceF(serviceName: string) {
-        StopService(serviceName).then(() => {})
-    }
-    function StartServiceF(serviceName: string) {
-        StartService(serviceName).then(() => {})
-    }
-    function RestartServiceF(serviceName: string) {
-        RestartService(serviceName).then(() => {})
-    }
+    const handleRestartService = (serviceName: string) => {
+        RestartService(serviceName)
+          .then((response) => {
+            const data = JSON.parse(response);
+            if (data?.Error) {
+              props.showErrorMessage(data.Error);
+            }
+          });
+      };
+    
+      const handleStopService = (serviceName: string) => {
+        StopService(serviceName)
+          .then((response) => {
+            const data = JSON.parse(response);
+            if (data?.Error) {
+              props.showErrorMessage(data.Error);
+            }
+          });
+      };
+    
+      const handleStartService = (serviceName: string) => {
+        StartService(serviceName)
+          .then((response) => {
+            const data = JSON.parse(response);
+            if (data?.Error) {
+              props.showErrorMessage(data.Error);
+            }
+          });
+      };
     // right click menu edit 
     return (
         <div className='h-[calc(100vh-15rem)] overflow-y-scroll overflow-visible'>
             <SortableTable rows={filteredServices} columns={
                 [
-                    {"field": "Name", "headerName": "Service","width": 300},
+                    {"field": "Name", "headerName": "Service","width": 300,renderCell: (params: any) => (
+                            <p className="font-bold">{params.value}</p>)},
                     {"field": "Status", "headerName": "Status","width": 200},
                     {"field": "Description", "headerName": "Description","width": 300},
                     {
@@ -110,7 +121,7 @@ function ServicesForGroup({ searchQuery }: { searchQuery: string }) {
                             if (params.row.Status === 'active') {
                                 return (
                                     <div>
-                                        <button onClick={() => RestartServiceF(params.row.Name)}>
+                                        <button onClick={() => handleRestartService(params.row.Name)}>
                                             <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg"
                                                  stroke="#a7ff24">
                                                 <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -122,7 +133,7 @@ function ServicesForGroup({ searchQuery }: { searchQuery: string }) {
                                                 </g>
                                             </svg>
                                         </button>
-                                        <button onClick={() => StopServiceF(params.row.Name)}>
+                                        <button onClick={() => handleStopService(params.row.Name)}>
                                             <svg className="h-5 w-5" viewBox="-0.5 0 25 25" fill="red" xmlns="http://www.w3.org/2000/svg">
                                                 <path
                                                     d="M17 3.42004H7C4.79086 3.42004 3 5.2109 3 7.42004V17.42C3 19.6292 4.79086 21.42 7 21.42H17C19.2091 21.42 21 19.6292 21 17.42V7.42004C21 5.2109 19.2091 3.42004 17 3.42004Z"
@@ -133,7 +144,7 @@ function ServicesForGroup({ searchQuery }: { searchQuery: string }) {
                                 )
                             }
                             return (
-                                <button onClick={() => StartServiceF(params.row.Name)}>
+                                <button onClick={() => handleStartService(params.row.Name)}>
                                     <svg className="w-5 h-5" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#000000">
                                         <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                                         <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>

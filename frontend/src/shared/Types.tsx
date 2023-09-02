@@ -32,3 +32,7 @@ export interface ServiceFile {
     Service :ServiceSection
     Install :InstallSection
 }
+
+export interface BackendError {
+    Error: string;
+}

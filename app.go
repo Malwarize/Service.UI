@@ -5,8 +5,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"os"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type App struct {
@@ -16,6 +17,16 @@ type App struct {
 func NewApp() *App {
 	return &App{}
 }
+
+type Error struct {
+	Error string `json:"Error"`
+}
+
+func ErrorDialog(message string) string {
+	dataJson, _ := json.Marshal(Error{Error: message})
+	return string(dataJson)
+}
+
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
 }
@@ -30,61 +41,73 @@ func (a *App) Minimize() {
 	)
 }
 func (a *App) FetchServices() string {
-	services, _ := backend.GetServices()
+	services, err := backend.GetServices()
+	if err != nil {
+		return ErrorDialog(err.Error())
+	}
 	dataJson, _ := json.Marshal(services)
 	return string(dataJson)
 }
-func (a *App) StopService(name string) {
+func (a *App) StopService(name string) string {
 	err := backend.StopService(name)
 	if err != nil {
-		fmt.Println(err)
+		return ErrorDialog(err.Error())
 	}
+	return "{}"
 }
-func (a *App) StartService(name string) {
+func (a *App) StartService(name string) string {
 	err := backend.StartService(name)
 	if err != nil {
-		fmt.Println(err)
+		return ErrorDialog(err.Error())
 	}
+	return "{}"
 }
-func (a *App) RestartService(name string) {
+func (a *App) RestartService(name string) string {
 	err := backend.RestartService(name)
 	if err != nil {
-		fmt.Println(err)
+		return ErrorDialog(err.Error())
 	}
+	return "{}"
 }
 func (a *App) FetchServiceGroup() string {
-	groups, _ := backend.GetServiceGroups()
+	groups, err := backend.GetServiceGroups()
+	if err != nil {
+		return ErrorDialog(err.Error())
+	}
 	dataJson, _ := json.Marshal(groups)
 	return string(dataJson)
 }
 func (a *App) FetchServicesOfAGroup(category string) string {
-	services, _ := backend.GetServicesOfAGroup(category)
+	services, err := backend.GetServicesOfAGroup(category)
+	if err != nil {
+		return ErrorDialog(err.Error())
+	}
 	dataJson, _ := json.Marshal(services)
 	return string(dataJson)
 }
-func (a *App) AddGroup(category string, description string) {
+func (a *App) AddGroup(category string, description string) string {
 	err := backend.AddGroup(category, description)
 	if err != nil {
-		fmt.Println(err)
+		return ErrorDialog(err.Error())
 	}
+	return "{}"
 }
-func (a *App) AddServiceToGroup(category string, name string) {
+func (a *App) AddServiceToGroup(category string, name string) string {
 	err := backend.AddServiceToGroup(category, name)
 	if err != nil {
-		fmt.Println(err)
+		return ErrorDialog(err.Error())
 	}
+	return "{}"
 }
-func (a *App) CreateService(name string, description string, after string, the_type string, execStart string, workingDirectory string, restart string, wantedBy string, category string) {
+func (a *App) CreateService(name string, description string, after string, the_type string, execStart string, workingDirectory string, restart string, wantedBy string, category string) string {
 	// validate
 	if name == "" {
-		fmt.Println("name is empty")
-		return
+		return ErrorDialog("name is empty")
 	}
 	// validate after check if after exists
 	services, err := backend.GetServices()
 	if err != nil {
-		fmt.Println(err)
-		return
+		return ErrorDialog(err.Error())
 	}
 	var i = 0
 	for _, s := range services {
@@ -94,69 +117,70 @@ func (a *App) CreateService(name string, description string, after string, the_t
 		i++
 	}
 	if i > len(services) {
-		fmt.Println("no such service")
-		return
+		return ErrorDialog("no service with name " + after + " found")
+
 	}
 
 	// validate type
 	if the_type != "simple" && the_type != "forking" && the_type != "oneshot" && the_type != "dbus" && the_type != "notify" && the_type != "idle" {
-		fmt.Println("invalid type", the_type)
-		return
+		return ErrorDialog("invalid type " + the_type)
+
 	}
 
 	// validate restart
 	if restart != "always" && restart != "no" && restart != "on-success" && restart != "on-failure" && restart != "on-abnormal" && restart != "on-watchdog" && restart != "on-abort" {
-		fmt.Println("invalid restart", restart)
-		return
+		return ErrorDialog("invalid restart " + restart)
 	}
 
 	// validate wantedBy
 	if wantedBy != "multi-user.target" && wantedBy != "graphical.target" && wantedBy != "rescue.target" && wantedBy != "emergency.target" {
-		fmt.Println("invalid wantedBy", wantedBy)
-		return
+		return ErrorDialog("invalid wantedBy " + wantedBy)
+
 	}
 
 	// validate category
 	groups, err := backend.GetServiceGroups()
 	if err != nil {
-		fmt.Println(err)
-		return
+		return ErrorDialog(err.Error())
+
 	}
 	if _, ok := groups[category]; !ok {
-		fmt.Println("invalid category", category)
-		return
+		return ErrorDialog("invalid category " + category)
+
 	}
 	// validate workingDirectory
 	// check if workingDirectory exists
 	if workingDirectory != "" {
 		if _, err := os.Stat(workingDirectory); os.IsNotExist(err) {
-			fmt.Println("workingDirectory does not exist", workingDirectory)
-			return
+			return ErrorDialog("workingDirectory " + workingDirectory + " does not exist")
+
 		}
 	}
 	// validate execStart
 	if execStart == "" {
-		fmt.Println("execStart is empty")
-		return
+		return ErrorDialog("execStart is empty")
+
 	}
 
 	err = backend.CreateService(name, description, after, the_type, execStart, workingDirectory, restart, wantedBy, category)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return ErrorDialog(err.Error())
+
 	}
+	return "{}"
 }
-func (a *App) EditService(name string, description string, after string, the_type string, execStart string, workingDirectory string, restart string, wantedBy string, category string) {
+func (a *App) EditService(name string, description string, after string, the_type string, execStart string, workingDirectory string, restart string, wantedBy string, category string) string {
 	// validate
 	if name == "" {
-		fmt.Println("name is empty")
-		return
+		return ErrorDialog("name is empty")
 	}
+
+	// check if service exists
+
 	// validate after check if after exists
 	services, err := backend.GetServices()
 	if err != nil {
-		fmt.Println(err)
-		return
+		return ErrorDialog(err.Error())
 	}
 	var i = 0
 	for _, s := range services {
@@ -166,81 +190,80 @@ func (a *App) EditService(name string, description string, after string, the_typ
 		i++
 	}
 	if i > len(services) {
-		fmt.Println("no such service")
-		return
+		return ErrorDialog("no service with name " + after + " found")
+
 	}
 
 	// validate type
 	if the_type != "simple" && the_type != "forking" && the_type != "oneshot" && the_type != "dbus" && the_type != "notify" && the_type != "idle" {
-		fmt.Println("invalid type", the_type)
-		return
+		return ErrorDialog("invalid type " + the_type)
+
 	}
 
 	// validate restart
 	if restart != "always" && restart != "no" && restart != "on-success" && restart != "on-failure" && restart != "on-abnormal" && restart != "on-watchdog" && restart != "on-abort" {
-		fmt.Println("invalid restart", restart)
-		return
+		return ErrorDialog("invalid restart " + restart)
+
 	}
 
 	// validate wantedBy
 	if wantedBy != "multi-user.target" && wantedBy != "default.target" && wantedBy != "network-online.target" && wantedBy != "sysinit.target" && wantedBy != "basic.target" && wantedBy != "graphical.target" && wantedBy != "shutdown.target" {
-		fmt.Println("invalid wantedBy", wantedBy)
-		return
+		return ErrorDialog("invalid wantedBy " + wantedBy)
+
 	}
 	// validate category
 	groups, err := backend.GetServiceGroups()
 	if err != nil {
-		fmt.Println(err)
-		return
+		return ErrorDialog(err.Error())
+
 	}
 	if _, ok := groups[category]; !ok {
-		fmt.Println("invalid category", category)
-		return
+		return ErrorDialog("invalid category " + category)
+
 	}
 	// validate workingDirectory
 	// check if workingDirectory exists
 	if workingDirectory != "" {
 		if _, err := os.Stat(workingDirectory); os.IsNotExist(err) {
-			fmt.Println("workingDirectory does not exist", workingDirectory)
-			return
+			return ErrorDialog("workingDirectory " + workingDirectory + " does not exist")
+
 		}
 	}
 	// validate execStart
 	if execStart == "" {
-		fmt.Println("execStart is empty")
-		return
+		return ErrorDialog("execStart is empty")
+
 	}
 
 	err = backend.EditService(name, description, after, the_type, execStart, workingDirectory, restart, wantedBy, category)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return ErrorDialog(err.Error())
+
 	}
+	return "{}"
 }
 func (a *App) FetchServiceFile(name string) string {
 	serviceFile, err := backend.GetServiceFile(name)
 	if err != nil {
-		fmt.Println(err)
-		return ""
+		return ErrorDialog(err.Error())
 	}
 	dataJson, err := json.Marshal(serviceFile)
 	if err != nil {
-		fmt.Println(err)
-		return ""
+		return ErrorDialog(err.Error())
 	}
 	return string(dataJson)
 }
-func (a *App) DeleteService(name string) {
+func (a *App) DeleteService(name string) string {
 	err := backend.DeleteService(name)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return ErrorDialog(err.Error())
 	}
+	return "{}"
 }
-func (a *App) DeleteGroup(name string) {
+func (a *App) DeleteGroup(name string) string {
 	err := backend.DeleteGroup(name)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return ErrorDialog(err.Error())
 	}
+	return "{}"
 }
