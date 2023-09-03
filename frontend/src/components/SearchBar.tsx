@@ -1,4 +1,4 @@
-import "../output.css";
+import "../App.css";
 interface SearchBarProps {
     searchQuery: string;
     setSearchQuery: (query: string) => void;

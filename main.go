@@ -6,7 +6,6 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/linux"
-	"os"
 )
 
 //go:embed all:frontend/dist
@@ -14,10 +13,10 @@ var assets embed.FS
 
 func main() {
 	// check if user have permission to run this app
-	if os.Getuid() != 0 {
-		println("Error: Please run this app as root")
-		os.Exit(1)
-	}
+	//if os.Getuid() != 0 {
+	//	println("Error: Please run this app as root")
+	//	os.Exit(1)
+	//}
 
 	// Create an instance of the app structure
 	app := NewApp()

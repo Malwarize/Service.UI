@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {JournalLog} from "../shared/Types";
 import {FetchLogsForService} from "../../wailsjs/go/main/App";
 import {DataGrid, gridClasses} from "@mui/x-data-grid";
+import Loading from "../layouts/Loading";
 
 interface props {
     service: string;
@@ -11,6 +12,7 @@ export default  function LogViewerService(props: props){
     const [logLines, setLogLines] = useState<JournalLog[]>([
         {Timestamp: "2021-01-01 00:00:00", Message: "Loading..."}
     ]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         FetchLogsForService(props.service).then((jsonString) => {
@@ -19,6 +21,7 @@ export default  function LogViewerService(props: props){
                 props.showErrorMessage(parsedLogs.Error);
             }else{
                 setLogLines(parsedLogs);
+                setIsLoading(false)
             }
         }).catch((error) => {
             props.showErrorMessage(error)
@@ -42,7 +45,7 @@ export default  function LogViewerService(props: props){
         // Create a string representing date, time, and seconds
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
-    return (
+    return (isLoading? <Loading/> : (
         <div className="h-[calc(100vh-14rem)] overflow-y-scroll overflow-visible">
             <DataGrid
                columns={[
@@ -68,8 +71,10 @@ export default  function LogViewerService(props: props){
                disableColumnMenu={true}
                disableColumnSelector={true}
                disableRowSelectionOnClick={true}
+               
             />
+        
         </div>
-
+    )
     )
 }

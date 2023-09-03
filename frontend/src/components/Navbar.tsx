@@ -1,6 +1,6 @@
 import React from 'react';
-import '../output.css';
-import { Link } from 'react-router-dom';
+import '../App.css';
+import {Link, useLocation} from 'react-router-dom';
 import {WindowIsMaximised, WindowMaximise, WindowUnmaximise} from "../../wailsjs/runtime";
 
 function Navbar() {
@@ -14,8 +14,7 @@ function Navbar() {
           }
       })
   }
-
-
+  const location = useLocation();
   return (
     <nav
     className="h-screen flex bg-none flex-col space-y-5 px-3 py-2"
@@ -25,7 +24,7 @@ function Navbar() {
     } as React.CSSProperties}
     onDoubleClick={ToggleMaximise}
     >
-                    <Link to={"/"}>
+                    <Link to={"/"} onDoubleClick={e => e.stopPropagation()} className={location.pathname === '/' ? 'shadow-lg bg-second-purple rounded-md' : ''}>
                     <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M20 12V6C20 4.89543 19.1046 4 18 4H12M20 12V18C20 19.1046 19.1046 20 18 20H12M20 12H12M4 12V18C4 19.1046 4.89543 20 6 20H12M4 12V6C4 4.89543 4.89543 4 6 4H12M4 12H12M12 12V4M12 12V20"
@@ -33,7 +32,7 @@ function Navbar() {
                     </svg>
                     </Link>
 
-                    <Link to={"/groups"}>
+                    <Link to={"/groups"} onDoubleClick={e => e.stopPropagation()}  className={location.pathname === '/groups' ? 'shadow-lg bg-second-purple rounded-md' : ''}>
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                         <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
@@ -53,8 +52,8 @@ function Navbar() {
                         </g>
                     </svg>
                     </Link>
-
-                <a className="absolute bottom-5" href="#">
+                <Link to={'/'} className={location.pathname === '/' ? 'shadow-lg bg-second-purple rounded-md' : ''}>
+                <a className="absolute bottom-5" href="#" >
                     <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g id="Interface / Settings">
                             <g id="Vector">
@@ -68,6 +67,8 @@ function Navbar() {
                         </g>
                     </svg>
                 </a>
+                </Link>
+                
     </nav>
   );
 }

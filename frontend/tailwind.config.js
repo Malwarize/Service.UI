@@ -10,6 +10,7 @@ module.exports = {
         'primary-purple': '#564C93',
         'primary-gray' : '#D9D9D9',
         'deep-gray' :'#686868',
+        'second-purple':'#675bb0'
       },
     },
 

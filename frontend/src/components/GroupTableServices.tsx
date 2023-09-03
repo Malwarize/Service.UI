@@ -3,11 +3,13 @@ import {DeleteGroup, FetchServiceGroup} from '../../wailsjs/go/main/App';
 import {Groups} from "../shared/Types";
 import GroupTable from "./GroupTable";
 import {useNavigate} from "react-router-dom";
+import Loading from "../layouts/Loading";
 
 
 export default  function GroupTableServices (props : {  showErrorMessage : any}) {
-        const [groups, setGroups] = useState<Groups>({});
-        const navigate = useNavigate();
+    const [groups, setGroups] = useState<Groups>({});
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     function fetchGroups() {
             // Fetch groups when the component mounts
@@ -18,10 +20,12 @@ export default  function GroupTableServices (props : {  showErrorMessage : any})
                     if (parsedGroups?.Error) {
                         props.showErrorMessage(parsedGroups.Error);
                     }
+                    setIsLoading(false)
                 })
                 .catch((error) => {
                     props.showErrorMessage(error);
                 });
+
         }
         useEffect(() => {
             fetchGroups(); // Initial data fetch
@@ -71,9 +75,10 @@ export default  function GroupTableServices (props : {  showErrorMessage : any})
 
     ]
 
-    return (
+    return (isLoading? <Loading/> : (
         <div className='h-[calc(100vh-15rem)] overflow-y-scroll overflow-visible'>
             <GroupTable rows={rows} columns={columns}/>
         </div>
+        )
     )
 }

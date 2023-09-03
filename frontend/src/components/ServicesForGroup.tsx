@@ -8,6 +8,7 @@ import {
 import SortableTable from './SortableTable';
 import {Link} from "react-router-dom";
 import {ServiceInfo} from "../shared/Types";
+import Loading from '../layouts/Loading';
 
 
 interface props {
@@ -17,6 +18,7 @@ interface props {
 
 function ServicesForGroup(props : props) {
     const [services, setServices] = useState<ServiceInfo[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     // /#/group/categoryName
     const groupName = window.location.hash.split("/")[2]
@@ -24,10 +26,11 @@ function ServicesForGroup(props : props) {
     function fetchServicesData() {
         FetchServicesOfAGroup(groupName).then((jsonString) => {
             const parsedServices = JSON.parse(jsonString);
+            setServices(parsedServices)
             if (parsedServices?.Error) {
                 props.showErrorMessage(parsedServices.Error);
             }
-            setServices(parsedServices)
+            setIsLoading(false)
         }
         ).catch((error) => {
             props.showErrorMessage(error)
@@ -82,7 +85,7 @@ function ServicesForGroup(props : props) {
           });
       };
     // right click menu edit 
-    return (
+    return (isLoading? <Loading/> : (
         <div className='h-[calc(100vh-15rem)] overflow-y-scroll overflow-visible'>
             <SortableTable rows={filteredServices} columns={
                 [
@@ -168,6 +171,7 @@ function ServicesForGroup(props : props) {
                 ]
             }/>
         </div>
+    )
     );
 }
 

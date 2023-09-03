@@ -1,4 +1,4 @@
-import "../output.css";
+import "../App.css";
 import {Exit} from "../../wailsjs/go/main/App";
 import {Minimize} from "../../wailsjs/go/main/App";
 import SearchBar from "./SearchBar";

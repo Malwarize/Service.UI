@@ -1,4 +1,4 @@
-import '../output.css';
+import '../App.css';
 import BaseLayout from '../layouts/BaseLayout';
 import Header from "../components/Header";
 import React from "react";
