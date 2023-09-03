@@ -4,7 +4,6 @@ import (
 	"changeme/backend"
 	"context"
 	"encoding/json"
-	"fmt"
 	"golang.org/x/exp/slices"
 	"os"
 
@@ -36,7 +35,6 @@ func (a *App) Exit() {
 	os.Exit(0)
 }
 func (a *App) Minimize() {
-	fmt.Println("Minimize")
 	runtime.WindowMinimise(
 		a.ctx,
 	)

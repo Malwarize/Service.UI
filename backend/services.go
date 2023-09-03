@@ -104,7 +104,6 @@ func GetServiceFile(name string) (ServiceFile, error) {
 		fmt.Println("error finding service file-------->,", err.Error())
 		return serviceFile, err
 	}
-	fmt.Println("service path-------->", servicePath)
 	data, err := os.ReadFile(servicePath)
 	if err != nil {
 		return serviceFile, err

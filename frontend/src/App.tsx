@@ -1,4 +1,4 @@
-import './output.css';
+import './App.css';
 import Main from './pages/Main';
 import Groups from './pages/Groups';
 import {Routes, Route, HashRouter} from "react-router-dom";
