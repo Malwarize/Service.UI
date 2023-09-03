@@ -274,3 +274,15 @@ func (a *App) FetchLogsForService(name string) string {
 	}
 	return string(dataJson)
 }
+
+func (a *App) FetchAllLogs() string {
+	journalCtlLogs, err := backend.GetAllJournalctl()
+	if err != nil {
+		return ErrorDialog(err.Error())
+	}
+	dataJson, err := json.Marshal(journalCtlLogs)
+	if err != nil {
+		return ErrorDialog(err.Error())
+	}
+	return string(dataJson)
+}

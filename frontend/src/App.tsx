@@ -8,6 +8,7 @@ import AddGroup from "./pages/AddGroup";
 import AddService from "./pages/AddService";
 import EditService from "./pages/EditService";
 import LogViewer from "./pages/LogViewer";
+import GlobalLogViewer from "./pages/GlobalLogViewer";
 
 
 export default function App() {
@@ -20,7 +21,9 @@ export default function App() {
                 <Route path="/addGroup" element={<AddGroup />} />
                 <Route path="/groups/:groupName/addService/" element={<AddService />} />
                 <Route path="/groups/:groupName/editService/:serviceName" element={<EditService />} />
+                <Route path="/logs" element={<GlobalLogViewer />} />
                 <Route path={"logs/:serviceName"} element={<LogViewer />} />
+
             </Routes>
         </HashRouter>
     );

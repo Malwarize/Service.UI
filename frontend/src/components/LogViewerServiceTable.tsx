@@ -15,18 +15,19 @@ export default  function LogViewerService(props: props){
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        FetchLogsForService(props.service).then((jsonString) => {
-            const parsedLogs = JSON.parse(jsonString);
-                if (parsedLogs?.Error) {
-                props.showErrorMessage(parsedLogs.Error);
-            }else{
-                setLogLines(parsedLogs);
-                setIsLoading(false)
+            FetchLogsForService(props.service).then((jsonString) => {
+                const parsedLogs = JSON.parse(jsonString);
+                    if (parsedLogs?.Error) {
+                    props.showErrorMessage(parsedLogs.Error);
+                }else{
+                    setLogLines(parsedLogs);
+                    setIsLoading(false)
+                }
+            }).catch((error) => {
+                props.showErrorMessage(error)
             }
-        }).catch((error) => {
-            props.showErrorMessage(error)
-        }
-        )}, []);
+            )
+    }, []);
     function realtimeTimestampToDateTimeHourSec(realtimeTimestamp:any) {
         // Convert the microseconds timestamp to milliseconds
         const millisecondsTimestamp = parseInt(realtimeTimestamp) / 1000;

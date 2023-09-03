@@ -15,6 +15,8 @@ export function EditService(arg1:string,arg2:string,arg3:string,arg4:string,arg5
 
 export function Exit():Promise<void>;
 
+export function FetchAllLogs():Promise<string>;
+
 export function FetchLogsForService(arg1:string):Promise<string>;
 
 export function FetchServiceFile(arg1:string):Promise<string>;

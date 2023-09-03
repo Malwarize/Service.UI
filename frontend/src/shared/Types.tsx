@@ -41,3 +41,14 @@ export interface JournalLog {
 export interface JournalLogs {
     logs: JournalLog[];
 }
+
+export interface AllJournalLog {
+    Timestamp: string;
+    HostName: string;
+    Process:string;
+    Message: string;
+}
+
+export interface AllJournalLogs{
+    logs: AllJournalLog[]; 
+}
