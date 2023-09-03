@@ -23,9 +23,6 @@ function ServicesForGroup(props : props) {
 
     function fetchServicesData() {
         FetchServicesOfAGroup(groupName).then((jsonString) => {
-            if (jsonString === "null") {
-                return
-            }
             const parsedServices = JSON.parse(jsonString);
             if (parsedServices?.Error) {
                 props.showErrorMessage(parsedServices.Error);

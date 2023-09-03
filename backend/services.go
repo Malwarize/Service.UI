@@ -306,10 +306,11 @@ func GetServicesOfAGroup(category string) ([]ServiceInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	for _, fileService := range fileServices {
+	for i, fileService := range fileServices {
 		for _, allService := range allServices {
 			if fileService.Name == allService.Name {
 				fileService.Status = allService.Status
+				fileServices[i] = fileService
 			}
 		}
 	}

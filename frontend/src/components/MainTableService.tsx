@@ -111,7 +111,10 @@ function MainTableService(props: props) {
               if (params.row.Status === "active") {
                 return (
                   <div>
-                <button onClick={() => handleRestartService(params.row.Name)}>
+                <button onClick={(e) => {
+                    handleRestartService(params.row.Name)
+                    e.stopPropagation();
+                }}>
                       <svg
                         viewBox="0 0 24 24"
                         className="w-5 h-5"
@@ -136,7 +139,10 @@ function MainTableService(props: props) {
                         </g>
                       </svg>
                     </button>
-                    <button onClick={() => handleStopService(params.row.Name)}>
+                    <button onClick={e => {
+                        handleStopService(params.row.Name)
+                        e.stopPropagation();
+                    }}>
                       <svg
                         className="h-5 w-5"
                         viewBox="-0.5 0 25 25"
@@ -156,7 +162,10 @@ function MainTableService(props: props) {
                 );
               }
               return (
-                <button onClick={() => handleStartService(params.row.Name)}>
+                <button onClick={(e) => {
+                    handleStartService(params.row.Name)
+                    e.stopPropagation();
+                }}>
                 <svg
                     className="w-5 h-5"
                     viewBox="0 0 16 16"
@@ -180,8 +189,7 @@ function MainTableService(props: props) {
               );
             },
           },
-        ]}
-      />
+        ]}/>
     </div>
   );
 }

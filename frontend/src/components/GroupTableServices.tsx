@@ -9,7 +9,7 @@ export default  function GroupTableServices (props : {  showErrorMessage : any})
         const [groups, setGroups] = useState<Groups>({});
         const navigate = useNavigate();
 
-        useEffect(() => {
+    function fetchGroups() {
             // Fetch groups when the component mounts
             FetchServiceGroup()
                 .then((jsonString) => {
@@ -22,7 +22,16 @@ export default  function GroupTableServices (props : {  showErrorMessage : any})
                 .catch((error) => {
                     props.showErrorMessage(error);
                 });
-        }, []); // Empty dependency array means this effect runs once, when the component mounts
+        }
+        useEffect(() => {
+            fetchGroups(); // Initial data fetch
+
+            const intervalId = setInterval(fetchGroups, 500); // Fetch data every 4 seconds
+
+            return () => {
+                clearInterval(intervalId); // Cleanup on unmount
+            };
+        }, []);
 
         const handleDeleteGroup = (groupName: string) => {
             DeleteGroup(groupName).then((response) => {

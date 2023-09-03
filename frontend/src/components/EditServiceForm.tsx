@@ -1,138 +1,144 @@
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     FetchServices,
-    FetchServiceGroup, FetchServiceFile,EditService, DeleteService
+    FetchServiceGroup,
+    FetchServiceFile,
+    EditService,
+    DeleteService,
 } from "../../wailsjs/go/main/App";
-import { useNavigate } from "react-router-dom";
-import {Groups, ServiceFile, ServiceInfo} from "../shared/Types";
-import React, { useEffect, useState } from "react";
-import {restartOptions, types, wantedByOptions} from "../shared/Constants";
+import { Groups, ServiceInfo } from "../shared/Types";
+import {
+    restartOptions,
+    types,
+    wantedByOptions,
+} from "../shared/Constants";
 
-interface props {
-    showErrorMessage : any
+interface Props {
+    showErrorMessage: (message: string) => void;
 }
-export default function EditServiceForm(props : props ) {
+
+export default function EditServiceForm({ showErrorMessage }: Props) {
     const [services, setServices] = useState<ServiceInfo[]>([]);
     const [groups, setGroups] = useState<Groups>({});
-    const [serviceFile, setServiceFile] = useState<ServiceFile>({
-        Unit: {
-            Description: "",
-            After: "",
-        },
-        Service: {
-            Type: "",
-            ExecStart: "",
-            WorkingDirectory: "",
-            Restart: "",
-        },
-        Install: {
-            WantedBy: "",
-        },
+
+    const [formValues, setFormValues] = useState({
+        description: "",
+        after: "",
+        the_type: "",
+        execStart: "",
+        workingDirectory: "",
+        restart: "",
+        wantedBy: "",
+        category: "",
     });
+
     const ServiceName = window.location.hash.split("/")[4];
+    const defaultCategory = window.location.hash.split("/")[2];
+    const navigate = useNavigate();
 
     const handleDeleteService = () => {
-        DeleteService(ServiceName).then((jsonString) => {
-            const deleted = JSON.parse(jsonString);
-            if (deleted?.Error) {
-                console.log(deleted)
-                props.showErrorMessage(deleted.Error);
-            } else{
-                navigate("/groups/"+defaultCategory, { replace: true });
-            }
-        }).catch((error) => {
-            navigate("/groups/"+defaultCategory, { replace: true });
-        });
-    }
+        DeleteService(ServiceName)
+            .then((jsonString) => {
+                const deleted = JSON.parse(jsonString);
+                if (deleted?.Error) {
+                    showErrorMessage(deleted.Error);
+                } else {
+                    navigate("/groups/" + defaultCategory, { replace: true });
+                }
+            })
+            .catch((error) => {
+                showErrorMessage(error);
+            });
+    };
 
     const handleEditService = () => {
-        const description = (
-            document.getElementById("description") as HTMLInputElement
-        ).value;
-        const after = (
-            document.getElementById("after") as HTMLInputElement
-        ).value;
-        const the_type = (
-            document.getElementById("the_type") as HTMLInputElement
-        ).value;
-        const execStart = (
-            document.getElementById("execStart") as HTMLInputElement
-        ).value;
-        const workingDirectory = (
-            document.getElementById(
-                "workingDirectory"
-            ) as HTMLInputElement
-        ).value;
-        const restart = (
-            document.getElementById("restart") as HTMLInputElement
-        ).value;
-        const wantedBy = (
-            document.getElementById("wantedBy") as HTMLInputElement
-        ).value;
-        const category = (
-            document.getElementById("category") as HTMLInputElement
-        ).value;
+        EditService(
+            ServiceName,
+            formValues.description,
+            formValues.after,
+            formValues.the_type,
+            formValues.execStart,
+            formValues.workingDirectory,
+            formValues.restart,
+            formValues.wantedBy,
+            formValues.category
+        )
+            .then((jsonString) => {
+                const parsedServices = JSON.parse(jsonString);
+                if (parsedServices?.Error) {
+                    showErrorMessage(parsedServices.Error);
+                } else {
+                    navigate(`/groups/${defaultCategory}`);
+                }
+            })
+            .catch((error) => {
+                showErrorMessage(error);
+            });
+    };
 
-        EditService(ServiceName,description,after,the_type,execStart,workingDirectory,restart,wantedBy,category).then((jsonString) => {
-            const parsedServices = JSON.parse(jsonString);
-            if (parsedServices?.Error) {
-                props.showErrorMessage(parsedServices.Error);
-            }else {
-                navigate(`/groups/${defaultCategory}`);
-            }
-        }).catch((error) => {
-            props.showErrorMessage(error);
-        });
-    }
     useEffect(() => {
         FetchServices()
             .then((jsonString) => {
                 const parsedServices = JSON.parse(jsonString);
                 if (parsedServices?.Error) {
-                    props.showErrorMessage(parsedServices.Error);
+                    showErrorMessage(parsedServices.Error);
                 }
                 setServices(parsedServices);
             })
             .catch((error) => {
-                props.showErrorMessage(error);
+                showErrorMessage(error);
             });
     }, []);
 
-    useEffect( () => {
+    useEffect(() => {
         FetchServiceGroup()
-        .then((jsonString:string) => {
-            const parsedGroups = JSON.parse(jsonString);
-            if (parsedGroups?.Error) {
-                props.showErrorMessage(parsedGroups.Error);
-            }
-            setGroups(parsedGroups);
-        })
-        .catch((error) => {
-            props.showErrorMessage(error);
-        }
-    );
-    });
+            .then((jsonString: string) => {
+                const parsedGroups = JSON.parse(jsonString);
+                if (parsedGroups?.Error) {
+                    showErrorMessage(parsedGroups.Error);
+                }
+                setGroups(parsedGroups);
+            })
+            .catch((error) => {
+                showErrorMessage(error);
+            });
+    }, []);
 
-    useEffect( () => {
+    useEffect(() => {
         FetchServiceFile(ServiceName)
             .then((jsonString) => {
-            const parsedServiceFile = JSON.parse(jsonString);
-            if (parsedServiceFile?.Error) {
-                props.showErrorMessage(parsedServiceFile.Error);
+                const parsedServiceFile = JSON.parse(jsonString);
+                if (parsedServiceFile?.Error) {
+                    showErrorMessage(parsedServiceFile.Error);
+                }
+                const { Unit, Service, Install } = parsedServiceFile;
 
-            }
-            setServiceFile(parsedServiceFile)
-        }).catch((error) => {
-            props.showErrorMessage(error);
-            }
-        );
-        }
-    );
+                setFormValues({
+                    description: Unit.Description,
+                    after: Unit.After,
+                    the_type: Service.Type,
+                    execStart: Service.ExecStart,
+                    workingDirectory: Service.WorkingDirectory,
+                    restart: Service.Restart,
+                    wantedBy: Install.WantedBy,
+                    category: defaultCategory,
+                });
 
 
+            })
+            .catch((error) => {
+                showErrorMessage(error);
+            });
+    }, [ServiceName]);
 
-    const defaultCategory = window.location.hash.split("/")[2];
-
-    const navigate = useNavigate();
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = event.target;
+        setFormValues((prevValues) => ({
+            ...prevValues,
+            [name]: value,
+        }));
+    };
 
     return (
         <div className="h-[calc(100vh-10rem)] overflow-y-scroll overflow-visible">
@@ -152,130 +158,91 @@ export default function EditServiceForm(props : props ) {
                             id="description"
                             className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
                             placeholder="this is my flask service"
-                            defaultValue={serviceFile?.Unit?.Description}
+                            value={formValues.description}
+                            onChange={handleInputChange}
                         />
 
-                        <label htmlFor="after" className="text-sm font-bold text-gray-500">
-                            After
-                        </label>
+                         <label htmlFor="after" className="text-sm font-bold text-gray-500">
+                             After
+                         </label>
                         <select
                             name="after"
                             id="after"
                             className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
-                            defaultValue={serviceFile?.Unit?.After}
+
+                            onChange={handleInputChange}
+                            value={formValues.after}
                         >
-                            {services.map((service: ServiceInfo,index) => (
-                                <option key={index} value={service.Name}>{service.Name}</option>
-                            ))}
+                            {services.map((service) => {
+                                return (
+                                    <option key={service.Name} value={service.Name}>
+                                        {service.Name}
+                                    </option>
+                                );
+                            })}
                         </select>
 
-                        <label
-                            htmlFor="the_type"
-                            className="text-sm font-bold text-gray-500"
-                        >
+                        <label htmlFor="type" className="text-sm font-bold text-gray-500">
                             Type
                         </label>
-                        <select
-                            name="the_type"
-                            id="the_type"
-                            className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
-                            defaultValue={serviceFile?.Service?.Type}
-                        >
-                            {types.map((type,index) => (
-                                <option value={type} key={index}>{type}</option>
-                            ))}
-                            {/*<option value={serviceFile.Service.Type}>{serviceFile.Service.Type}</option>*/}
+                        <select name="the_type" id="type" className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"  onChange={handleInputChange} value={formValues.the_type}>
+                            {types.map((type) => {
+                                return (<option key={type} value={type}>
+                                    {type}
+                                </option>)
+                            })}
                         </select>
 
-                        <label
-                            htmlFor="execStart"
-                            className="text-sm font-bold text-gray-500"
-                        >
+                        <label htmlFor="execStart" className="text-sm font-bold text-gray-500">
                             ExecStart
                         </label>
-                        <input
-                            type="text"
-                            name="execStart"
-                            id="execStart"
-                            placeholder="python3 run.py"
-                            defaultValue={serviceFile?.Service?.ExecStart}
-                            className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
-                        />
+                        <input value={formValues.execStart} type="text" name="execStart" id="execStart" className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple" placeholder="/usr/bin/python3 app.py"  onChange={handleInputChange} />
 
-                        <label
-                            htmlFor="workingDirectory"
-                            className="text-sm font-bold text-gray-500"
-                        >
+                        <label htmlFor="workingDirectory" className="text-sm font-bold text-gray-500">
                             WorkingDirectory
                         </label>
-                        {/*directory selector */}
-                        <input
-                            type="text"
-                            name="workingDirectory"
-                            id="workingDirectory"
-                            className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
-                            placeholder={"/home/username/"}
-                            defaultValue={serviceFile?.Service?.WorkingDirectory}
-                        />
+                        <input value={formValues.workingDirectory} type="text" name="workingDirectory" id="workingDirectory" className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple" placeholder="/home/user/app"  onChange={handleInputChange} />
 
-                        <label
-                            htmlFor="restart"
-                            className="text-sm font-bold text-gray-500"
-                        >
+                        <label htmlFor="restart" className="text-sm font-bold text-gray-500">
                             Restart
                         </label>
-                        <select
-                            name="restart"
-                            id="restart"
-                            className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
-                            defaultValue={serviceFile?.Service?.Restart}
-                        >
-                            {restartOptions.map((restart,index) => (
-                                <option value={restart} key={index}>{restart}</option>
+                        <select name="restart" id="restart" className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"  onChange={handleInputChange} value={formValues.restart}>
+                            {restartOptions.map((restart) => (
+                                <option key={restart} value={restart}>
+                                    {restart}
+                                </option>
                             ))}
-                            {/*<option value={serviceFile.Service.Restart} key={serviceFile.Service.Restart}>{serviceFile.Service.Restart}</option>*/}
                         </select>
 
-                        <label
-                            htmlFor="wantedBy"
-                            className="text-sm font-bold text-gray-500"
-                        >
+                        <label htmlFor="wantedBy" className="text-sm font-bold text-gray-500">
                             WantedBy
                         </label>
-                        <select
-                            name="wantedBy"
-                            id="wantedBy"
-                            className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
-                            defaultValue={serviceFile?.Install?.WantedBy}
-                        >
-                            {wantedByOptions.map((wantedBy,index) => (
-                                <option value={wantedBy} key={index}>{wantedBy}</option>
+                        <select name="wantedBy" id="wantedBy" className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"  onChange={handleInputChange} value={formValues.wantedBy}>
+                            {wantedByOptions.map((wantedBy) => (
+                                <option key={wantedBy} value={wantedBy}>
+                                    {wantedBy}
+                                </option>
                             ))}
-                            {/*<option value={serviceFile.Install.WantedBy}>{serviceFile.Install.WantedBy}</option>*/}
                         </select>
-                        <label
-                            htmlFor="Category"
-                            className="text-sm font-bold text-gray-500"
-                        >
+
+                        <label htmlFor="category" className="text-sm font-bold text-gray-500">
                             Category
                         </label>
-                        <select
-                            name="category"
-                            id="category"
-                            className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"
-                            defaultValue={defaultCategory}
-                        >
-                            {Object.keys(groups).map((category,index) => (
-                                <option value={category} key={index}>{category}</option>
+                        <select name="category" id="category" className="w-full p-2 border border-gray-300 rounded outline-none focus:border-primary-purple"  onChange={handleInputChange} value={formValues.category}>
+                            {Object.keys(groups).map((group) => (
+                                <option key={group} value={group}>
+                                    {group}
+                                </option>
                             ))}
-                            {/*<option value={defaultCategory}>{defaultCategory}</option>*/}
                         </select>
+
                         <button className="w-full p-2 mt-4 bg-red-500 rounded shadow text-gray-100 hover:bg-deep-gray" onClick={handleDeleteService}>
                             Delete
                         </button>
                         <button
                             className="w-full p-2 mt-4 bg-primary-purple rounded shadow text-gray-100 hover:bg-purple-600"
-                            onClick={handleEditService}>
+                            onClick={handleEditService}
+                        >
                             Save
                         </button>
                     </div>
@@ -284,3 +251,4 @@ export default function EditServiceForm(props : props ) {
         </div>
     );
 }
+

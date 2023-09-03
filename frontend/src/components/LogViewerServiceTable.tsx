@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react";
 import {JournalLog} from "../shared/Types";
 import {FetchLogsForService} from "../../wailsjs/go/main/App";
-import SortableTable from "./SortableTable";
 import {DataGrid, gridClasses} from "@mui/x-data-grid";
 
 interface props {
@@ -16,7 +15,7 @@ export default  function LogViewerService(props: props){
     useEffect(() => {
         FetchLogsForService(props.service).then((jsonString) => {
             const parsedLogs = JSON.parse(jsonString);
-            if (parsedLogs?.Error) {
+                if (parsedLogs?.Error) {
                 props.showErrorMessage(parsedLogs.Error);
             }else{
                 setLogLines(parsedLogs);
@@ -41,9 +40,7 @@ export default  function LogViewerService(props: props){
         const seconds = date.getSeconds().toString().padStart(2, '0');
 
         // Create a string representing date, time, and seconds
-        const dateTimeHourSecString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-
-        return dateTimeHourSecString;
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
     return (
         <div className="h-[calc(100vh-14rem)] overflow-y-scroll overflow-visible">
