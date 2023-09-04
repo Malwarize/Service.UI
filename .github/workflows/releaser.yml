@@ -15,7 +15,6 @@ jobs:
       matrix:
         build: [
           { name: ServiceUI, platform: linux/amd64 , os: ubuntu-latest },
-          { name: ServiceUI, platform: linux/arm64 , os: ubuntu-latest },
         ]
     runs-on: ${{ matrix.build.os }}
     steps:
