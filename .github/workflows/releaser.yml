@@ -14,22 +14,20 @@ jobs:
       fail-fast: false
       matrix:
         build: [
-          { name: wailsTest, platform: linux/amd64 , os: ubuntu-latest },
-          { name: wailsTest, platform: linux/amd64 , os: debian-latest },
-          { name: wailsTest, platform: linux/amd64 , os: centos-latest },
-          { name: wailsTest, platform: linux/amd64 , os: fedora-latest },
-          { name: wailsTest, platform: linux/arm64 , os: ubuntu-latest },
-          { name: wailsTest, platform: linux/arm64 , os: debian-latest },
-          { name: wailsTest, platform: linux/arm64 , os: centos-latest },
-          { name: wailsTest, platform: linux/arm64 , os: fedora-latest },
-          { name: wailsTest, platform: linux/386 , os: ubuntu-latest },
-          { name: wailsTest, platform: linux/386 , os: debian-latest },
-          { name: wailsTest, platform: linux/386 , os: centos-latest },
-          { name: wailsTest, platform: linux/386 , os: fedora-latest },
-          { name: wailsTest, platform: linux/amd64 , os: ubuntu-latest },
-          { name: wailsTest, platform: linux/amd64 , os: debian-latest },
-          { name: wailsTest, platform: linux/amd64 , os: centos-latest },
-          { name: wailsTest, platform: linux/amd64 , os: fedora-latest },
+#          { name: ServiceUI, platform: linux/amd64 , os: ubuntu-latest },
+#          { name: ServiceUI, platform: linux/arm64 , os: ubuntu-latest },
+
+          { name: ServiceUI, platform: linux/amd64 , os: debian-latest },
+          { name: ServiceUI, platform: linux/arm64 , os: debian-latest },
+
+#          { name: ServiceUI, platform: linux/amd64 , os: centos-latest },
+#          { name: ServiceUI, platform: linux/arm64 , os: centos-latest },
+#
+#          { name: ServiceUI, platform: linux/amd64 , os: fedora-latest },
+#          { name: ServiceUI, platform: linux/arm64 , os: fedora-latest },
+#
+          { name: ServiceUI, platform: linux/amd64 , os: archlinux-latest },
+          { name: ServiceUI, platform: linux/arm64 , os: archlinux-latest },
         ]
     runs-on: ${{ matrix.build.os }}
     steps:
