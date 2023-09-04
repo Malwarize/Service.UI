@@ -14,20 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         build: [
-#          { name: ServiceUI, platform: linux/amd64 , os: ubuntu-latest },
-#          { name: ServiceUI, platform: linux/arm64 , os: ubuntu-latest },
-
-          { name: ServiceUI, platform: linux/amd64 , os: debian-latest },
-          { name: ServiceUI, platform: linux/arm64 , os: debian-latest },
-
-#          { name: ServiceUI, platform: linux/amd64 , os: centos-latest },
-#          { name: ServiceUI, platform: linux/arm64 , os: centos-latest },
-#
-#          { name: ServiceUI, platform: linux/amd64 , os: fedora-latest },
-#          { name: ServiceUI, platform: linux/arm64 , os: fedora-latest },
-#
-          { name: ServiceUI, platform: linux/amd64 , os: archlinux-latest },
-          { name: ServiceUI, platform: linux/arm64 , os: archlinux-latest },
+          { name: ServiceUI, platform: linux/amd64 , os: ubuntu-latest },
+          { name: ServiceUI, platform: linux/arm64 , os: ubuntu-latest },
         ]
     runs-on: ${{ matrix.build.os }}
     steps:
