@@ -7,6 +7,7 @@ import (
 	"github.com/Malwarize/Service.UI/backend"
 	"golang.org/x/exp/slices"
 	"os"
+	"os/exec"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -29,6 +30,17 @@ func ErrorDialog(message string) string {
 }
 
 func (a *App) startup(ctx context.Context) {
+	if os.Geteuid() != 0 {
+		println("Error: you need to be root to run this application")
+		os.Exit(1)
+	}
+
+	// check if systemctl is installed with which
+	_, err := exec.LookPath("systemctl")
+	if err != nil {
+		println("Error: systemctl not found or your system is not supported")
+		os.Exit(1)
+	}
 	a.ctx = ctx
 }
 func (a *App) Exit() {
