@@ -30,10 +30,11 @@ function ServicesForGroup(props : props) {
             if (parsedServices?.Error) {
                 props.showErrorMessage(parsedServices.Error);
             }
+            console.log(parsedServices)
             setIsLoading(false)
         }
         ).catch((error) => {
-            props.showErrorMessage(error)
+            console.log(error)
             }
         )
     }

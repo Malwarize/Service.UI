@@ -9,8 +9,17 @@ import (
 	"strings"
 )
 
-var ServicesPath = "/etc/systemd/system/"
-var DbPath = "/home/xorbit/Desktop/services.json"
+type Config struct {
+	ServicesPath string `json:"servicesPath"`
+	DbFilePath   string `json:"dbFile"`
+}
+
+func DefaultConfig() *Config {
+	return &Config{
+		ServicesPath: "/etc/systemd/system/",
+		DbFilePath:   "/etc/servicesUI.json",
+	}
+}
 
 type ServiceInfo struct {
 	Name        string `json:"Name"`
@@ -73,7 +82,7 @@ func (s *ServiceFile) Save(name string) error {
 	content += fmt.Sprintf("WantedBy=%s\n", s.Install.WantedBy)
 
 	// write the file
-	f, err := os.Create(ServicesPath + name + ".service")
+	f, err := os.Create(DefaultConfig().ServicesPath + name + ".service")
 	if err != nil {
 		return err
 	}
@@ -226,7 +235,7 @@ func (g Groups) Save() error {
 	if err != nil {
 		return err
 	}
-	fp, err := os.Create(DbPath)
+	fp, err := os.Create(DefaultConfig().DbFilePath)
 	if err != nil {
 		return err
 	}
@@ -255,7 +264,7 @@ func initJson() {
 	if err != nil {
 		return
 	}
-	fp, err := os.Create(DbPath)
+	fp, err := os.Create(DefaultConfig().DbFilePath)
 	if err != nil {
 		return
 	}
@@ -268,10 +277,10 @@ func initJson() {
 
 func GetServiceGroups() (Groups, error) {
 	//	 check if the services.json exists
-	if _, err := os.Stat(DbPath); os.IsNotExist(err) {
+	if _, err := os.Stat(DefaultConfig().DbFilePath); os.IsNotExist(err) {
 		initJson()
 	}
-	fp, err := os.Open(DbPath)
+	fp, err := os.Open(DefaultConfig().DbFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -309,6 +318,7 @@ func GetServicesOfAGroup(category string) ([]ServiceInfo, error) {
 		for _, allService := range allServices {
 			if fileService.Name == allService.Name {
 				fileService.Status = allService.Status
+				fileService.Description = allService.Description
 				fileServices[i] = fileService
 			}
 		}
@@ -362,7 +372,7 @@ func AddServiceToGroup(category string, name string) error {
 
 func CreateService(name string, description string, after string, the_type string, execStart string, workingDirectory string, restart string, wantedBy string, category string) error {
 	// check if the service exists
-	if _, err := os.Stat(ServicesPath + name + ".service"); !os.IsNotExist(err) {
+	if _, err := os.Stat(DefaultConfig().ServicesPath + name + ".service"); !os.IsNotExist(err) {
 		return fmt.Errorf("the service already exists")
 	}
 	// check if the category exists
@@ -399,14 +409,12 @@ func CreateService(name string, description string, after string, the_type strin
 	err = AddServiceToGroup(category, name)
 	// enable the service
 	cmd := exec.Command("systemctl", "daemon-reload")
-	out, err := cmd.CombinedOutput()
-	fmt.Println(string(out))
+	_, err = cmd.CombinedOutput()
 	if err != nil {
 		return err
 	}
 	cmd = exec.Command("systemctl", "enable", name+".service")
-	out, err = cmd.CombinedOutput()
-	fmt.Println(string(out))
+	_, err = cmd.CombinedOutput()
 	if err != nil {
 		return err
 	}
@@ -464,6 +472,7 @@ func EditService(name string, description string, after string, the_type string,
 
 func DeleteService(name string) error {
 	servicePath, err := findServiceUnitFile(name)
+	fmt.Println(servicePath)
 	if err != nil {
 		return err
 	}
@@ -473,10 +482,11 @@ func DeleteService(name string) error {
 	// disable the service
 	cmd = exec.Command("systemctl", "disable", name+".service")
 	_ = cmd.Run()
-
+	fmt.Println("service path: " + servicePath)
 	// delete the service file
 	err = os.Remove(servicePath)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	// delete the service from the groups

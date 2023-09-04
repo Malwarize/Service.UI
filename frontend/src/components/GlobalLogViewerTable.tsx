@@ -24,7 +24,7 @@ export default  function GlobalLogViewerServiceTable(props: props){
                 setIsLoading(false)
             }
         }).catch((error) => {
-                props.showErrorMessage(error)
+            console.log(error)
             }
         )
     }

@@ -7,7 +7,7 @@ import {
     EditService,
     DeleteService,
 } from "../../wailsjs/go/main/App";
-import { Groups, ServiceInfo } from "../shared/Types";
+import { Groups,    ServiceInfo } from "../shared/Types";
 import {
     restartOptions,
     types,
@@ -19,9 +19,20 @@ interface Props {
 }
 
 export default function EditServiceForm({ showErrorMessage }: Props) {
+    const handleDeleteService =  () => {
+        DeleteService(ServiceName).then((res:any) => (res.json())).then((data:any) => {
+            if (data?.Error) {
+                showErrorMessage(data.Error);
+            } else {
+                navigate(`/groups/${defaultCategory}`);
+            }
+
+        }).catch((error) => {
+            console.log(error)
+        })
+    };
     const [services, setServices] = useState<ServiceInfo[]>([]);
     const [groups, setGroups] = useState<Groups>({});
-
     const [formValues, setFormValues] = useState({
         description: "",
         after: "",
@@ -36,22 +47,6 @@ export default function EditServiceForm({ showErrorMessage }: Props) {
     const ServiceName = window.location.hash.split("/")[4];
     const defaultCategory = window.location.hash.split("/")[2];
     const navigate = useNavigate();
-
-    const handleDeleteService = () => {
-        DeleteService(ServiceName)
-            .then((jsonString) => {
-                const deleted = JSON.parse(jsonString);
-                if (deleted?.Error) {
-                    showErrorMessage(deleted.Error);
-                } else {
-                    navigate("/groups/" + defaultCategory, { replace: true });
-                }
-            })
-            .catch((error) => {
-                showErrorMessage(error);
-            });
-    };
-
     const handleEditService = () => {
         EditService(
             ServiceName,
@@ -73,7 +68,7 @@ export default function EditServiceForm({ showErrorMessage }: Props) {
                 }
             })
             .catch((error) => {
-                showErrorMessage(error);
+                console.log(error)
             });
     };
 
@@ -87,7 +82,7 @@ export default function EditServiceForm({ showErrorMessage }: Props) {
                 setServices(parsedServices);
             })
             .catch((error) => {
-                showErrorMessage(error);
+                console.log(error)
             });
     }, []);
 
@@ -101,7 +96,7 @@ export default function EditServiceForm({ showErrorMessage }: Props) {
                 setGroups(parsedGroups);
             })
             .catch((error) => {
-                showErrorMessage(error);
+                console.log(error)
             });
     }, []);
 
@@ -111,6 +106,9 @@ export default function EditServiceForm({ showErrorMessage }: Props) {
                 const parsedServiceFile = JSON.parse(jsonString);
                 if (parsedServiceFile?.Error) {
                     showErrorMessage(parsedServiceFile.Error);
+                    if ( parsedServiceFile.Error.includes("open : no such file or directory") ) {
+                        navigate(`/groups/${defaultCategory}`);
+                    }
                 }
                 const { Unit, Service, Install } = parsedServiceFile;
 
@@ -128,9 +126,9 @@ export default function EditServiceForm({ showErrorMessage }: Props) {
 
             })
             .catch((error) => {
-                showErrorMessage(error);
+                console.log(error)
             });
-    }, [ServiceName]);
+    }, []);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = event.target;
@@ -248,7 +246,6 @@ export default function EditServiceForm({ showErrorMessage }: Props) {
                     </div>
                 </form>
             </div>
-        </div>
-    );
+        </div>)
 }
 

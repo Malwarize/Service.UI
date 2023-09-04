@@ -18,7 +18,7 @@ export default function AddGroupForm(props : props){
                 navigate(`/groups/`)
             }
         }).catch((error) => {
-            props.showErrorMessage(error.toString())
+            console.log(error)
         });
     }
 

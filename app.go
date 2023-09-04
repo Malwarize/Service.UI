@@ -1,9 +1,10 @@
 package main
 
 import (
-	"changeme/backend"
 	"context"
 	"encoding/json"
+	"fmt"
+	"github.com/Malwarize/Service.UI/backend"
 	"golang.org/x/exp/slices"
 	"os"
 
@@ -250,6 +251,7 @@ func (a *App) FetchServiceFile(name string) string {
 func (a *App) DeleteService(name string) string {
 	err := backend.DeleteService(name)
 	if err != nil {
+		fmt.Println("error deleting service", err)
 		return ErrorDialog(err.Error())
 	}
 	return "{}"

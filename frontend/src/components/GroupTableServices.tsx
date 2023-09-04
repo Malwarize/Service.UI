@@ -23,7 +23,7 @@ export default  function GroupTableServices (props : {  showErrorMessage : any})
                     setIsLoading(false)
                 })
                 .catch((error) => {
-                    props.showErrorMessage(error);
+                    console.log(error)
                 });
 
         }

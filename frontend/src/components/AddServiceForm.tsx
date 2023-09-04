@@ -22,7 +22,7 @@ export default function AddServiceForm(props : props ) {
               setServices(parsedServices);
           })
           .catch((error) => {
-              props.showErrorMessage(error);
+                console.log(error);
           });
   }, []);
 
