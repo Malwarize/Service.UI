@@ -1,6 +1,6 @@
 ![Group 1](https://github.com/Malwarize/Service.UI/assets/130087473/09112b6f-ee28-4e79-9d61-39c01888a46a)
 
-first modern UI for the systemctl management 
+first modern UI for the systemctl management
 
 ### Manage Services
 
@@ -12,5 +12,5 @@ first modern UI for the systemctl management
 ### Create and Edit your Services
 ![createService](https://github.com/Malwarize/Service.UI/assets/130087473/66ab89d1-3170-425c-b00d-80f08dbfd0ff)
 
-### Watch logs 
+### Watch logs
 ![Logs](https://github.com/Malwarize/Service.UI/assets/130087473/9e8e2dd5-2089-4be1-9bb0-57e728d36666)
