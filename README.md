@@ -11,6 +11,7 @@
 ## overview
 Service.UI is a modern UI that enables application developers to seamlessly work with systemctl and services
 
+# ⚠️ the project on developement, so if you face any bug please report it in the issues section
 ## Download
 you can download the latest version of Service.UI from the [releases](#) page.
 
