@@ -13,7 +13,7 @@ Service.UI is a modern UI that enables application developers to seamlessly work
 
 # ⚠️ the project on developement, so if you face any bug please report it in the issues section
 ## Download
-you can download the latest version of Service.UI from the [releases](#) page.
+you can download the latest version of Service.UI from the [releases](https://github.com/Malwarize/Service.UI/releases/latest) page.
 
 ## Features
 *  ✅ start, stop, restart and reload services
@@ -32,7 +32,7 @@ you can download the latest version of Service.UI from the [releases](#) page.
 Service.UI is an open source project and your contribution is very much appreciated.
 1. Check for open issues or open a fresh issue to start a discussion around a feature idea or a bug.
 2. Fork the repository on GitHub to start making your changes to the master branch (or branch off of it).
-   3Send a pull request and bug the maintainer until it gets merged and published. :)
+   Send a pull request and bug the maintainer until it gets merged and published. :)
 3. Alternatively, feel free to contact me via [email](mailto:aliawada127001@outlook.com) or [twitter](https://x.com/XORbit_01).
 
 ### Community
