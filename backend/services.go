@@ -9,18 +9,6 @@ import (
 	"strings"
 )
 
-type Config struct {
-	ServicesPath string `json:"servicesPath"`
-	DbFilePath   string `json:"dbFile"`
-}
-
-func DefaultConfig() *Config {
-	return &Config{
-		ServicesPath: "/etc/systemd/system/",
-		DbFilePath:   "/etc/servicesUI.json",
-	}
-}
-
 type ServiceInfo struct {
 	Name        string `json:"Name"`
 	Status      string `json:"Status"`
@@ -82,7 +70,7 @@ func (s *ServiceFile) Save(name string) error {
 	content += fmt.Sprintf("WantedBy=%s\n", s.Install.WantedBy)
 
 	// write the file
-	f, err := os.Create(DefaultConfig().ServicesPath + name + ".service")
+	f, err := os.Create(GetConfig().ServicesPath + name + ".service")
 	if err != nil {
 		return err
 	}
@@ -235,7 +223,7 @@ func (g Groups) Save() error {
 	if err != nil {
 		return err
 	}
-	fp, err := os.Create(DefaultConfig().DbFilePath)
+	fp, err := os.Create(GetConfig().DbFilePath)
 	if err != nil {
 		return err
 	}
@@ -264,7 +252,7 @@ func initJson() {
 	if err != nil {
 		return
 	}
-	fp, err := os.Create(DefaultConfig().DbFilePath)
+	fp, err := os.Create(GetConfig().DbFilePath)
 	if err != nil {
 		return
 	}
@@ -277,10 +265,10 @@ func initJson() {
 
 func GetServiceGroups() (Groups, error) {
 	//	 check if the services.json exists
-	if _, err := os.Stat(DefaultConfig().DbFilePath); os.IsNotExist(err) {
+	if _, err := os.Stat(GetConfig().DbFilePath); os.IsNotExist(err) {
 		initJson()
 	}
-	fp, err := os.Open(DefaultConfig().DbFilePath)
+	fp, err := os.Open(GetConfig().DbFilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -372,7 +360,7 @@ func AddServiceToGroup(category string, name string) error {
 
 func CreateService(name string, description string, after string, the_type string, execStart string, workingDirectory string, restart string, wantedBy string, category string) error {
 	// check if the service exists
-	if _, err := os.Stat(DefaultConfig().ServicesPath + name + ".service"); !os.IsNotExist(err) {
+	if _, err := os.Stat(GetConfig().ServicesPath + name + ".service"); !os.IsNotExist(err) {
 		return fmt.Errorf("the service already exists")
 	}
 	// check if the category exists
