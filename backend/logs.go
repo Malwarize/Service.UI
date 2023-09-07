@@ -2,6 +2,7 @@ package backend
 
 import (
 	"encoding/json"
+	"fmt"
 	"os/exec"
 	"strings"
 )
@@ -88,6 +89,7 @@ func GetAllJournalctl() ([]AllLogEntryOut, error) {
 		var logEntry AllLogEntryIn
 		err := json.Unmarshal([]byte(logJSON), &logEntry)
 		if err != nil {
+			fmt.Println("EROOOOOR", err, logJSON)
 			return nil, err
 		}
 		logEntryO := AllLogEntryOut{

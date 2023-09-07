@@ -52,3 +52,8 @@ export interface AllJournalLog {
 export interface AllJournalLogs{
     logs: AllJournalLog[]; 
 }
+
+export interface Config {
+    db_file_path: string;
+    services_path: string;
+}

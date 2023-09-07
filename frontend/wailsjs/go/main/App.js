@@ -22,6 +22,10 @@ export function DeleteService(arg1) {
   return window['go']['main']['App']['DeleteService'](arg1);
 }
 
+export function EditConfig(arg1, arg2) {
+  return window['go']['main']['App']['EditConfig'](arg1, arg2);
+}
+
 export function EditService(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) {
   return window['go']['main']['App']['EditService'](arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
 }
@@ -32,6 +36,10 @@ export function Exit() {
 
 export function FetchAllLogs() {
   return window['go']['main']['App']['FetchAllLogs']();
+}
+
+export function FetchConfig() {
+  return window['go']['main']['App']['FetchConfig']();
 }
 
 export function FetchLogsForService(arg1) {

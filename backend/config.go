@@ -30,7 +30,7 @@ func LoadConfig() error {
 func Init() error {
 	content, err := json.Marshal(Config{
 		DbFilePath:   "/home/xorbit/Desktop/.ServiceUiDb.json",
-		ServicesPath: "/home/xorbit/Desktop/.ServiceUiServices.json",
+		ServicesPath: "/home/xorbit/Desktop/",
 	})
 	if err != nil {
 		return err
@@ -54,8 +54,8 @@ func SaveConfig() error {
 	return nil
 }
 
-func SetConfig(c *Config) {
-	config = c
+func SetConfig(c Config) {
+	config = &c
 }
 
 func GetConfig() *Config {
@@ -73,4 +73,14 @@ func GetConfig() *Config {
 		}
 	}
 	return config
+}
+
+func EditConfig(DbFilePath string, ServicesPath string) error {
+	config.DbFilePath = DbFilePath
+	config.ServicesPath = ServicesPath
+	err := SaveConfig()
+	if err != nil {
+		return err
+	}
+	return SaveConfig()
 }

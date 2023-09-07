@@ -2,7 +2,7 @@ import '../App.css';
 import BaseLayout from '../layouts/BaseLayout';
 import MainTableService from '../components/MainTableService';
 import Header from "../components/Header";
-import React, {useState} from "react";
+import React from "react";
 import ErrorBox from '../components/ErrorBox';
 function Main(){
     const [searchQuery, setSearchQuery] = React.useState('');

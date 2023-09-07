@@ -11,11 +11,15 @@ export function DeleteGroup(arg1:string):Promise<string>;
 
 export function DeleteService(arg1:string):Promise<string>;
 
+export function EditConfig(arg1:string,arg2:string):Promise<string>;
+
 export function EditService(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string,arg6:string,arg7:string,arg8:string,arg9:string):Promise<string>;
 
 export function Exit():Promise<void>;
 
 export function FetchAllLogs():Promise<string>;
+
+export function FetchConfig():Promise<string>;
 
 export function FetchLogsForService(arg1:string):Promise<string>;
 

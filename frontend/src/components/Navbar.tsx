@@ -55,8 +55,7 @@ function Navbar() {
                     <Link to={"/logs"} onDoubleClick={e => e.stopPropagation()}  className={location.pathname === '/logs' ? 'shadow-lg bg-second-purple rounded-md' : ''}>
                     <svg  className='w-10 h-10' viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <rect x="4" y="4" width="16" height="16" rx="3" stroke="#000000" stroke-width="2"></rect> <path d="M16 10L8 10" stroke="#000000" stroke-width="2" stroke-linecap="round"></path> <path d="M16 14L8 14" stroke="#000000" stroke-width="2" stroke-linecap="round"></path> </g></svg>
                     </Link>
-                    <Link to={'/'} className={location.pathname === '/' ? 'shadow-lg bg-second-purple rounded-md' : ''}>
-                    <a className="absolute bottom-5" href="#" >
+                    <Link to={'/settings'} className={location.pathname === '/settings' ? 'shadow-lg bg-second-purple rounded-md absolute bottom-5' : 'absolute bottom-5'}>
                         <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g id="Interface / Settings">
                                 <g id="Vector">
@@ -69,7 +68,6 @@ function Navbar() {
                                 </g>
                             </g>
                         </svg>
-                    </a>
                     </Link>
 
     </nav>
