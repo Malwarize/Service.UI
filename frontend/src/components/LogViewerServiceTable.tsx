@@ -51,7 +51,7 @@ export default  function LogViewerService(props: props){
             <DataGrid
                columns={[
                      { field: 'Timestamp', headerName: 'Time', width: 200, sortable: true , renderCell: (params: any) =>  <p className={"text-gray-500"}>{params.value}</p>},
-                     { field: 'Message', headerName: 'Message', width: 800, sortable: false },
+                     { field: 'Message', headerName: 'Message', width: 700, sortable: false , renderCell: (params: any) =>  <p className={"text-gray-500 overflow-visible"}>{params.value}</p>},
                     ]}
                 rows={logLines? logLines.map((logLine) => {
                     return {

@@ -3,6 +3,7 @@ import {AllJournalLog, JournalLog} from "../shared/Types";
 import {FetchAllLogs} from "../../wailsjs/go/main/App";
 import {DataGrid, gridClasses} from "@mui/x-data-grid";
 import Loading from "../layouts/Loading";
+import {TextField} from "@mui/material";
 
 interface props {
     showErrorMessage: any;
@@ -62,7 +63,7 @@ export default  function GlobalLogViewerServiceTable(props: props){
                         { field: 'Timestamp', headerName: 'Time', width: 200, sortable: true , renderCell: (params: any) =>  <p className={"text-gray-500"}>{params.value}</p>},
                         {field: 'HostName', headerName: 'Host', width: 100, sortable: true},
                         { field: 'Process', headerName: 'Process', width: 100, sortable: true },
-                        { field: 'Message', headerName: 'Message', width: 600, sortable: false },
+                        { field: 'Message', headerName: 'Message', width: 500, sortable: false , renderCell: (params: any) =>  <p className={"text-gray-500 overflow-visible"}>{params.value}</p>},
                     ]}
                     rows={logLines? logLines.map((logLine) => {
                         return {
