@@ -30,10 +30,10 @@ func ErrorDialog(message string) string {
 }
 
 func (a *App) startup(ctx context.Context) {
-	if os.Geteuid() != 0 {
-		println("Error: you need to be root to run this application")
-		os.Exit(1)
-	}
+	//if os.Geteuid() != 0 {
+	//	println("Error: you need to be root to run this application")
+	//	os.Exit(1)
+	//}
 
 	// check if systemctl is installed with which
 	_, err := exec.LookPath("systemctl")
@@ -286,7 +286,6 @@ func (a *App) FetchLogsForService(name string) string {
 	}
 	return string(dataJson)
 }
-
 func (a *App) FetchAllLogs() string {
 	journalCtlLogs, err := backend.GetAllJournalctl()
 	if err != nil {
@@ -297,4 +296,19 @@ func (a *App) FetchAllLogs() string {
 		return ErrorDialog(err.Error())
 	}
 	return string(dataJson)
+}
+func (a *App) FetchConfig() string {
+	conf := backend.GetConfig()
+	dataJson, err := json.Marshal(conf)
+	if err != nil {
+		return ErrorDialog(err.Error())
+	}
+	return string(dataJson)
+}
+func (a *App) EditConfig(DbFilePath string, ServicesPath string) string {
+	err := backend.EditConfig(DbFilePath, ServicesPath)
+	if err != nil {
+		return ErrorDialog(err.Error())
+	}
+	return "{}"
 }
