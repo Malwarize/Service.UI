@@ -1,11 +1,11 @@
-![banner](https://github.com/Malwarize/Service.UI/assets/130087473/124d1491-527c-42ea-b132-f6b3934a106e)
+![img](https://github.com/Malwarize/Service.UI/assets/130087473/124d1491-527c-42ea-b132-f6b3934a106e)
 
 
 ## first modern UI for the systemctl management
 
 
 
-![image](https://github.com/Malwarize/Service.UI/assets/130087473/7cc901f6-7613-4949-afef-279ac5e20d49)
+![banner](https://github.com/Malwarize/Service.UI/assets/130087473/7cc901f6-7613-4949-afef-279ac5e20d49)
 
 
 ## overview
